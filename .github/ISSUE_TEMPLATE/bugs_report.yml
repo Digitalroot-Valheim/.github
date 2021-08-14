@@ -34,7 +34,10 @@ body:
     id: screenshots 
     attributes:
       label: Screenshots
-      description: If applicable, add screenshots to help explain your problem.
+      description: | 
+        If applicable, add screenshots to help explain your problem.
+        
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
       placeholder: Attach files by clicking here and then dragging & dropping, selecting or pasting them.
     validations:
       required: false
@@ -53,6 +56,7 @@ body:
         2. Edit your `BepInEx.cfg` file. Find the `[Logging.Disk]` section and set `LogLevels = All`
         3. Run the game and reproduce the bug.
         4. Upload/attach your `LogOutput.log` file that contains the error. It can be found at `C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\LogOutput.log`
+        
         Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
       placeholder: Attach files by clicking here and then dragging & dropping, selecting or pasting them.
     validations:
