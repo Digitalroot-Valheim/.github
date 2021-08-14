@@ -22,7 +22,10 @@ body:
     attributes:
       label: To Reproduce
       description: Steps to reproduce the behavior
-      placeholder: Tell us what you see!
+      placeholder: Tell us how to do it.
+      value: |
+      1. Go to '...' |
+      2. Click on '....'
     validations:
       required: true      
   - type: textarea
