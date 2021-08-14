@@ -37,7 +37,7 @@ body:
     id: screenshots 
     attributes:
       label: Screenshots
-      description: If applicable, add screenshots to help explain your problem.
+      description: If applicable, add screenshots to help explain your problem and solution.
       placeholder: Attach files by clicking here and then dragging & dropping, selecting or pasting them.
     validations:
       required: false
