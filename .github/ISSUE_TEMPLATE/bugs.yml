@@ -18,6 +18,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: steps-Reproduce 
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: Tell us what you see!
+    validations:
+      required: true      
+  - type: textarea
     id: logs
     attributes:
       label: Relevant log output
