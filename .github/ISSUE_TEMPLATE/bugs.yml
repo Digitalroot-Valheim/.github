@@ -24,8 +24,8 @@ body:
       description: Steps to reproduce the behavior
       placeholder: Tell us how to do it.
       value: |
-      1. Go to '...' |
-      2. Click on '....'
+        1. Go to '...' |
+        2. Click on '....'
     validations:
       required: true      
   - type: textarea
