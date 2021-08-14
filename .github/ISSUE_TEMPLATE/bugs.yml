@@ -29,7 +29,15 @@ body:
         3. Scroll down to '....'
         4. See error
     validations:
-      required: true      
+      required: true
+  - type: textarea
+    id: screenshots 
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: Attach files by dragging & dropping, selecting or pasting them.
+    validations:
+      required: false
   - type: textarea
     id: logs
     attributes:
