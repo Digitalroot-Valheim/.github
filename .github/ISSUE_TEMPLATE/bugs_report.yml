@@ -9,6 +9,17 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    id: game-type
+    attributes:
+      label: How are you playing the game?
+      options:
+        - Single Player - No Server
+        - Multiplayer Player - My Client Hosts Server
+        - Multiplayer Player - Other Client Hosts Server
+        - Multiplayer Player - Dedicated Server
+    validations:
+      required: true        
   - type: textarea
     id: what-happened
     attributes:
