@@ -15,9 +15,9 @@ body:
       label: How are you playing the game?
       options:
         - Single Player - No Server
-        - Multiplayer Player - My Client Hosts Server
-        - Multiplayer Player - Other Client Hosts Server
-        - Multiplayer Player - Dedicated Server
+        - Multiplayer - My Client Hosts Server
+        - Multiplayer - Other Client Hosts Server
+        - Multiplayer - Dedicated Server
     validations:
       required: true        
   - type: textarea
