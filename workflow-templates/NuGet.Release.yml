@@ -8,8 +8,8 @@ on:
       - '.github/workflows/**' 
 
 env:
-  SLN_FILE_NAME: Digitalroot.Valheim.Common.Json.sln
-  PROJ: Digitalroot.Valheim.Common.Json
+  SLN_FILE_NAME: Digitalroot.sln
+  PROJ: Digitalroot.
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -93,7 +93,7 @@ jobs:
           retention-days: 1
 
       - name: Download Sleet Config
-        run: wget https://raw.githubusercontent.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Json/main/src/sleet.json
+        run: wget https://raw.githubusercontent.com/Digitalroot-Valheim/.github/main/sleet.json
 
       - name: Save Sleet Config
         uses: actions/upload-artifact@v2
