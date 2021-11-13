@@ -158,7 +158,7 @@ jobs:
 
   #[POSTBUILD]
   postbuild:
-    if: always()
+    if: ${{ inputs.skipunittest == false }}
     needs: [build]
     runs-on: ubuntu-latest
     steps:
