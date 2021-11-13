@@ -31,6 +31,21 @@ on:
         default: false
         type: boolean
 
+      awsregion:
+        description: 'AWS Region'
+        required: false
+        default: 'us-west-2'
+        type: string
+        
+    secrets:
+      awsaccesskeyid:
+        description: 'AWS Access Key Id'
+        required: false
+        
+      awssecretaccesskey:
+        description: 'AWS Secret Access Key'      
+        required: false
+
 env:
   SLN_FILE_NAME: ${{ inputs.slnfilename }}.sln
   PROJ: ${{ inputs.projfilename }}
@@ -211,9 +226,9 @@ jobs:
 
       - name: Push to S3 nuget repository
         env:
-          AWS_ACCESS_KEY_ID: ${{secrets.NUGET_S3_REPO_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.NUGET_S3_REPO_KEY_SECRET}}
-          AWS_DEFAULT_REGION: us-west-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
+          AWS_DEFAULT_REGION: ${{ input.awsregion }}
         run: |
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
