@@ -228,7 +228,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
-          AWS_DEFAULT_REGION: ${{ input.awsregion }}
+          AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
         run: |
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
