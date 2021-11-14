@@ -95,12 +95,13 @@ jobs:
         with:
           version: ${{ steps.previoustag.outputs.tag }}
 
-      - name: Print Ref
+      - name: Print Info
         run: | 
-          echo $GITHUB_REF
-          echo ${{ github.ref.name }}
-          echo $GITHUB_RUN_NUMBER
-          echo ${{ steps.get-latest-tag.outputs.tag }}
+          echo "::notice title=GITHUB_REF::$GITHUB_REF"
+          echo "::notice title=GITHUB_RUN_NUMBER::$GITHUB_RUN_NUMBER"
+          echo "::notice title='Previous Tag'::${{ steps.previoustag.outputs.tag }}"
+          echo "::notice title='Next Tag'::${{ steps.semvers.outputs.patch }}"          
+          echo "::notice title='Next Patch'::${{ steps.semvers.outputs.patch }}" 
 
       - name: Build    
         run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-restore --nologo /p:Version=${{ steps.semvers.outputs.patch }}
@@ -143,6 +144,7 @@ jobs:
           retention-days: 1
 
       - name: get-net-sdk-project-versions-action
+        if: ${{ !always() }}
         uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
         id: get-version
         with:
