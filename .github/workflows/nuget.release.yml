@@ -212,7 +212,7 @@ jobs:
           source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
 
       - name: Push to GH nuget repository
-        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate -v n
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate
 
   #[PUSH S3]
   push-s3-nuget:
