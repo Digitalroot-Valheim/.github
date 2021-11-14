@@ -82,6 +82,20 @@ jobs:
 
       - name: Restore
         run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} --nologo
+        
+      - name: Get Assembly Version
+        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
+        id: get-version
+        with:
+          proj-path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
+      - run : |
+          echo "version ${{steps.get-version.outputs.version}}"
+          echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
+          echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
+          echo "package-version ${{steps.get-version.outputs.package-version}}" 
+          echo "assembly-version ${{steps.get-version.outputs.assembly-version}}" 
+          echo "file-version ${{steps.get-version.outputs.file-version}}" 
+          echo "informational-version ${{steps.get-version.outputs.informational-version}}"         
 
       - name: Get Previous tag
         uses: actions-ecosystem/action-get-latest-tag@2ddc5e77f49bfdf508d612c5311867985fe5d59c
@@ -94,6 +108,7 @@ jobs:
         id: semvers
         with:
           version: ${{ steps.previoustag.outputs.tag }}
+          initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Print Info
         run: | 
@@ -142,21 +157,6 @@ jobs:
           path: ${{ github.workspace }}/sleet.json
           name: sleet-config
           retention-days: 1
-
-      - name: get-net-sdk-project-versions-action
-        if: ${{ !always() }}
-        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
-        id: get-version
-        with:
-          proj-path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
-      - run : |
-          echo "version ${{steps.get-version.outputs.version}}"
-          echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
-          echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
-          echo "package-version ${{steps.get-version.outputs.package-version}}" 
-          echo "assembly-version ${{steps.get-version.outputs.assembly-version}}" 
-          echo "file-version ${{steps.get-version.outputs.file-version}}" 
-          echo "informational-version ${{steps.get-version.outputs.informational-version}}" 
 
   #[POSTBUILD]
   postbuild:
