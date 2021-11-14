@@ -136,7 +136,7 @@ jobs:
 
       - name: Build (w/ Version Bump)
         if: ${{ !inputs.forceassemblyversion }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-restore --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Build (w/o Version Bump)
         if: ${{ inputs.forceassemblyversion }}
