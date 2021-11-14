@@ -31,6 +31,12 @@ on:
         default: false
         type: boolean
 
+      forceassemblyversion:
+        description: 'Force the nuget package to use the assembly version'
+        required: false
+        default: false
+        type: boolean
+
       awsregion:
         description: 'AWS Region'
         required: false
@@ -118,27 +124,40 @@ jobs:
           echo "::notice title='Next Tag'::${{ steps.semvers.outputs.patch }}"          
           echo "::notice title='Next Patch'::${{ steps.semvers.outputs.patch }}" 
 
-      - name: Build    
+      - name: Build (w/ Version Bump)
+        if: ${{ !inputs.forceassemblyversion }}
         run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-restore --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
+      - name: Build (w/o Version Bump)
+        if: ${{ inputs.forceassemblyversion }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-restore --nologo -v n
+
       - name: Test
-        if: ${{ inputs.skipunittest == false }}
+        if: ${{ !inputs.skipunittest }}
         run: dotnet test $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
-        if: ${{ inputs.skipunittest == false }}
+        if: ${{ !inputs.skipunittest}}
         with:
           path: ${{ github.workspace }}/${{ inputs.srcpath }}/UnitTests/TestResults/test-results.trx
           name: test-results
           retention-days: 1
 
-      - name: Pack Release
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Pack Release (w/ Version Bump)
+        if: ${{ github.ref == 'refs/heads/main' && !inputs.forceassemblyversion }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
-      - name: Pack PreRelease
-        if: ${{ github.ref != 'refs/heads/main' }}
+      - name: Pack Release (w/o Version Bump)
+        if: ${{ github.ref == 'refs/heads/main' && inputs.forceassemblyversion }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+
+      - name: Pack PreRelease (w/ Version Bump)
+        if: ${{ github.ref != 'refs/heads/main' && !inputs.forceassemblyversion }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+
+      - name: Pack PreRelease (w/o Version Bump)
+        if: ${{ github.ref != 'refs/heads/main' && inputs.forceassemblyversion }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
@@ -160,7 +179,7 @@ jobs:
 
   #[POSTBUILD]
   postbuild:
-    if: ${{ inputs.skipunittest == false }}
+    if: ${{ !inputs.skipunittest }}
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -177,7 +196,7 @@ jobs:
           ls -la ${{ github.workspace }}
 
       - name: Test Reporter
-        if: ${{ inputs.skipunittest == false }}
+        if: ${{ !inputs.skipunittest }}
         uses: dorny/test-reporter@v1.5.0
         with:
           name: NUnit Tests                              # Name of the check run which will be created
@@ -235,6 +254,7 @@ jobs:
           dotnet tool install -g sleet
           wget https://api.nuget.org/v3-flatcontainer/microsoft.netframework.referenceassemblies.net462/1.0.2/microsoft.netframework.referenceassemblies.net462.1.0.2.nupkg
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
+          sleet push $GITHUB_WORKSPACE --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
           sleet retention prune --config $GITHUB_WORKSPACE/sleet-config/sleet.json
 
   #[PUBLISH]
