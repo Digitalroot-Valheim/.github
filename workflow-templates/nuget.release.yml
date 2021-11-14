@@ -22,5 +22,6 @@ jobs:
       projfilename: Digitalroot.Valheim.Common.Placeholder
       #srcpath: src
       #unittestpath: UnitTests
-      #skipunittest: false
+      #skipunittest: true
+      #forceassemblyversion: true
       #awsregion: us-west-2
