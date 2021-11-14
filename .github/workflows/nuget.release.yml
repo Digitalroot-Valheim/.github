@@ -104,6 +104,8 @@ jobs:
         id: get-version
         with:
           proj-path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
+          
+      - name: Print Assembly Version          
       - run : |
           echo "version ${{steps.get-version.outputs.version}}"
           echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
@@ -186,6 +188,16 @@ jobs:
           path: ${{ github.workspace }}/sleet.json
           name: sleet-config
           retention-days: 1
+          
+      - name: Cache packages to S3 nuget repository
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
+          AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
+        run: |
+          dotnet tool install -g sleet
+          sleet push $NUGET_PACKAGES --skip-existing --config $GITHUB_WORKSPACE/sleet.json
+         
 
   #[POSTBUILD]
   postbuild:
