@@ -252,32 +252,29 @@ jobs:
           AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
         run: |
           dotnet tool install -g sleet
-          wget https://api.nuget.org/v3-flatcontainer/microsoft.netframework.referenceassemblies.net462/1.0.2/microsoft.netframework.referenceassemblies.net462.1.0.2.nupkg
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
-          sleet push $GITHUB_WORKSPACE --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
           sleet retention prune --config $GITHUB_WORKSPACE/sleet-config/sleet.json
 
   #[PUBLISH]
   publish:
     needs: [build]
     runs-on: ubuntu-latest
-    #if: ${{ false }} # disable for now
-#    permissions:
-#      contents: write
+    if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
         with:
           name: nuget-package
 
-      - name: Bump version and push tag
+      - name: Build Release Notes
         id: tag_version
         uses: mathieudutour/github-tag-action@v5.6
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
 
-      - name: Create a GitHub release
+      - name: Create a GitHub release (w/ Version Bump)
+        if: ${{ !inputs.forceassemblyversion }}      
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.tag-version }}
@@ -289,3 +286,26 @@ jobs:
           artifacts: ${{ github.workspace }}/*.nupkg
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
+          
+      - name: Print Release Info
+        if: ${{ !inputs.forceassemblyversion }}
+        run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
+          
+      - name: Create a GitHub release (w/o Version Bump)
+        if: ${{ inputs.forceassemblyversion }}      
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.build.outputs.assembly-version }}
+          name: Release ${{ needs.build.outputs.assembly-version }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit: main
+          artifacts: ${{ github.workspace }}/*.nupkg
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+
+      - name: Print Release Info
+        if: ${{ inputs.forceassemblyversion }}      
+        run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
+
