@@ -86,7 +86,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Setup Package Cache
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+
       - name: Restore
+        if: steps.cache.outputs.cache-hit != 'true'
         run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} --nologo -v d
         
       - name: Get Assembly Version
