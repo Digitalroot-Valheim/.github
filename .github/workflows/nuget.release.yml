@@ -102,13 +102,13 @@ jobs:
         id: previoustag
         with:
           semver_only: true
+          initial_version: ${{steps.get-version.outputs.assembly-version}}          
 
       - name: Get next minor version
         uses: WyriHaximus/github-action-next-semvers@33d116a4c239252582a60a1ba8dbba63ad493ffd
         id: semvers
         with:
           version: ${{ steps.previoustag.outputs.tag }}
-          initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Print Info
         run: | 
