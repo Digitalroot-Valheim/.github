@@ -106,7 +106,7 @@ jobs:
           proj-path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
           
       - name: Print Assembly Version          
-      - run : |
+        run : |
           echo "version ${{steps.get-version.outputs.version}}"
           echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
           echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
