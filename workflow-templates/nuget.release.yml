@@ -27,3 +27,7 @@ jobs:
       #skip-unit-tests: true
       #force-assembly-version: true
       #aws-region: us-west-2
+      #nuget-gh-upload: true
+      #nuget-s3-upload: true
+      #nexus-enable-upload: true
+      #nexus-mod-id: 000
