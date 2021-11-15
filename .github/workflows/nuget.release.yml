@@ -42,7 +42,30 @@ on:
         required: false
         default: 'us-west-2'
         type: string
+
+      nugetghupload:
+        description: 'Upload the nuget package to gh nuget repo.'
+        required: false
+        default: false
+        type: boolean
+
+      nugets3upload:
+        description: 'Upload the nuget package to S3 nuget repo.'
+        required: false
+        default: false
+        type: boolean
+
+      nxupload:
+        description: 'Upload Mod to Nexus'
+        required: false
+        default: false
+        type: boolean
         
+      nxid:
+        description: 'Nexus Id for the mod.'
+        required: false
+        type: number
+
     secrets:
       awsaccesskeyid:
         description: 'AWS Access Key Id'
@@ -50,6 +73,14 @@ on:
         
       awssecretaccesskey:
         description: 'AWS Secret Access Key'      
+        required: false
+        
+      nxapikey:
+        description: 'Nexus Api key'
+        required: false
+        
+      nxcookiesheader:
+        description: 'Nexus Cookie Header'
         required: false
 
 env:
@@ -59,6 +90,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
 jobs:
   #[PREBUILD]
   prebuild:
@@ -232,6 +264,7 @@ jobs:
 
   #[PUSH GH]
   push-gh-nuget:
+    if: ${{ inputs.nugetghupload }}
     needs: [build]
     runs-on: ubuntu-latest
     permissions:
@@ -257,6 +290,7 @@ jobs:
 
   #[PUSH S3]
   push-s3-nuget:
+    if: ${{ inputs.nugets3upload }}
     needs: [build]
     runs-on: ubuntu-latest
     env:
@@ -330,4 +364,36 @@ jobs:
       - name: Print Release Info
         if: ${{ inputs.forceassemblyversion }}      
         run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
+
+  # Nexus Upload
+  nexusupload:
+    name: Upload to Nexus Mods
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        id: download
+        with:
+          name: ${{ inputs.artifactName }}
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore tools
+        run: dotnet tool install -g nexusuploader
+
+      - name: Upload
+        env:
+          UNEX_GAME: valheim
+          UNEX_DEBUG: true
+          UNEX_APIKEY: ${{ secrets.nxapikey }} # UNEX_API_KEY
+          UNEX_COOKIES: ${{ secrets.nxcookiesheader }} # UNEX_COOKIES
+ 
+        run: |
+          dotnet unex upload ${{ inputs.nxid }} {{ inputs.artifactName }} -v ${{ inputs.artifactVersion }}
+          dotnet unex changelog "Test Change" ${{ inputs.artifactVersion }} -m ${{ inputs.nxid }} -g "valheim"
+
 
