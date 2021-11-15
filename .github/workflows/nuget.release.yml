@@ -237,11 +237,11 @@ jobs:
 
       - name: Pack PreRelease (w/ Version Bump)
         if: ${{ github.ref != 'refs/heads/main' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix ${{ steps.vars.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Pack PreRelease (w/o Version Bump)
         if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix ${{ steps.vars.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
         uses: actions/upload-artifact@v2
