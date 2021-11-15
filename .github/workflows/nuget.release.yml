@@ -120,6 +120,7 @@ jobs:
           echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::set-output name=version::${{ steps.get-version.outputs.version }}"
 
       - name: Log Inputs
         run: | 
@@ -154,9 +155,8 @@ jobs:
           proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
           
       - name: Print Assembly Version  
-        id: vars
         run : |
-          echo "::set-output name=version::${{ steps.get-version.outputs.version }}"
+          
           echo "version ${{steps.get-version.outputs.version}}"
           echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
           echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
