@@ -133,6 +133,9 @@ jobs:
           echo "::notice title=aws-region::${{ inputs.aws-region }}"
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+
+      - name: Log Inputs cont
+        run: | 
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
 
@@ -147,7 +150,7 @@ jobs:
       - name: Dump steps context
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "::notice title=date::$STEPS_CONTEXT"
+        run: echo "$STEPS_CONTEXT"
 
   #[BUILD]
   build:
