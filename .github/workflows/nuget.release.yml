@@ -3,89 +3,89 @@ name: NuGet Release
 on:
   workflow_call:
     inputs:
-      slnfilename:
-        description: 'Name of SLN file w/o .sln, assumes sln file is in the srcpath dir. e.g. ./srcpath/slnfilename.sln'
+      sln-file-name:
+        description: 'Name of SLN file w/o .sln, assumes sln file is in the src-path dir. e.g. ./src-path/sln-file-name.sln'
         required: true
         type: string
         
-      projfilename:
-        description: 'Name of proj file w/o .csproj, assumes proj dir is named the same as the projfilename. e.g. ./srcpath/projfilename/projfilename.csproj'
+      proj-file-name:
+        description: 'Name of proj file w/o .csproj, assumes proj dir is named the same as the proj-file-name. e.g. ./src-path/proj-file-name/proj-file-name.csproj'
         required: true
         type: string
       
-      srcpath:
+      src-path:
         description: 'Path to source w/o trailing /'
         required: false
         default: 'src'
         type: string
         
-      unittestpath:
-        description: 'Path to UnitTest project dir w/o trailing /, assumes path starts after srcpath. e.g. ./srcpath/unittestpath'
+      unit-test-path:
+        description: 'Path to UnitTest project dir w/o trailing /, assumes path starts after src-path. e.g. ./src-path/unit-test-path'
         required: false
         default: 'UnitTests'
         type: string
         
-      skipunittest:
+      skip-unit-tests:
         description: 'Skip Unit Tests'
         required: false
         default: false
         type: boolean
 
-      forceassemblyversion:
+      force-assembly-version:
         description: 'Force the nuget package to use the assembly version'
         required: false
         default: false
         type: boolean
 
-      awsregion:
+      aws-region:
         description: 'AWS Region'
         required: false
         default: 'us-west-2'
         type: string
 
-      nugetghupload:
+      nuget-gh-upload:
         description: 'Upload the nuget package to gh nuget repo.'
         required: false
         default: false
         type: boolean
 
-      nugets3upload:
+      nuget-s3-upload:
         description: 'Upload the nuget package to S3 nuget repo.'
         required: false
         default: false
         type: boolean
 
-      nxupload:
+      nexus-enable-upload:
         description: 'Upload Mod to Nexus'
         required: false
         default: false
         type: boolean
         
-      nxid:
+      nexus-mod-id:
         description: 'Nexus Id for the mod.'
         required: false
         type: number
 
     secrets:
-      awsaccesskeyid:
+      aws-access-key-id:
         description: 'AWS Access Key Id'
         required: false
         
-      awssecretaccesskey:
+      aws-secret-access-key:
         description: 'AWS Secret Access Key'      
         required: false
         
-      nxapikey:
+      nexus-api-key:
         description: 'Nexus Api key'
         required: false
         
-      nxcookiesheader:
+      nexus-cookies-header:
         description: 'Nexus Cookie Header'
         required: false
 
 env:
-  SLN_FILE_NAME: ${{ inputs.slnfilename }}.sln
-  PROJ: ${{ inputs.projfilename }}
+  SLN_FILE_NAME: ${{ inputs.sln-file-name }}.sln
+  PROJ: ${{ inputs.proj-file-name }}
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -99,6 +99,20 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: Log Inputs
+        run: | 
+          echo "::notice title=sln-file-name::${{ inputs.sln-file-name }}"
+          echo "::notice title=proj-file-name::${{ inputs.proj-file-name }}"
+          echo "::notice title=src-path::${{ inputs.src-path }}"
+          echo "::notice title=unit-test-path::${{ inputs.unit-test-path }}"
+          echo "::notice title=skip-unit-tests::${{ inputs.skip-unit-tests }}"
+          echo "::notice title=force-assembly-version::${{ inputs.force-assembly-version }}"
+          echo "::notice title=aws-region::${{ inputs.aws-region }}"
+          echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
+          echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+          echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
+          echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::notice title=aws-access-key-id::${{ inputs.aws-access-key-id }}"
 
   #[BUILD]
   build:
@@ -129,13 +143,13 @@ jobs:
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
-        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} --nologo -v d
+        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} --nologo -v d
         
       - name: Get Assembly Version
         uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
         id: get-version
         with:
-          proj-path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
+          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
           
       - name: Print Assembly Version          
         run : |
@@ -169,45 +183,45 @@ jobs:
           echo "::notice title='Next Patch'::${{ steps.semvers.outputs.patch }}" 
 
       - name: Build (w/ Version Bump)
-        if: ${{ !inputs.forceassemblyversion }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ !inputs.force-assembly-version }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Build (w/o Version Bump)
-        if: ${{ inputs.forceassemblyversion }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --nologo -v n
+        if: ${{ inputs.force-assembly-version }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --nologo -v n
 
       - name: Test
-        if: ${{ !inputs.skipunittest }}
-        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.SLN_FILE_NAME }} -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
+        if: ${{ !inputs.skip-unit-tests }}
+        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
-        if: ${{ !inputs.skipunittest}}
+        if: ${{ !inputs.skip-unit-tests}}
         with:
-          path: ${{ github.workspace }}/${{ inputs.srcpath }}/UnitTests/TestResults/test-results.trx
+          path: ${{ github.workspace }}/${{ inputs.src-path }}/UnitTests/TestResults/test-results.trx
           name: test-results
           retention-days: 1
 
       - name: Pack Release (w/ Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && !inputs.forceassemblyversion }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Pack Release (w/o Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && inputs.forceassemblyversion }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Pack PreRelease (w/ Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && !inputs.forceassemblyversion }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        if: ${{ github.ref != 'refs/heads/main' && !inputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
 
       - name: Pack PreRelease (w/o Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && inputs.forceassemblyversion }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.srcpath }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
         uses: actions/upload-artifact@v2
         with:
-          path: ${{ github.workspace }}/${{ inputs.srcpath }}/${{ env.PROJ }}/bin/Release/*.nupkg
+          path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ env.PROJ }}/bin/Release/*.nupkg
           name: nuget-package
           retention-days: 1
 
@@ -223,16 +237,16 @@ jobs:
           
       - name: Cache packages to S3 nuget repository
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
-          AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
+          AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
         run: |
           dotnet tool install -g sleet
           sleet push $NUGET_PACKAGES --skip-existing --config $GITHUB_WORKSPACE/sleet.json
          
   #[POSTBUILD]
   postbuild:
-    if: ${{ !inputs.skipunittest }}
+    if: ${{ !inputs.skip-unit-tests }}
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -249,7 +263,7 @@ jobs:
           ls -la ${{ github.workspace }}
 
       - name: Test Reporter
-        if: ${{ !inputs.skipunittest }}
+        if: ${{ !inputs.skip-unit-tests }}
         uses: dorny/test-reporter@v1.5.0
         with:
           name: NUnit Tests                              # Name of the check run which will be created
@@ -263,7 +277,7 @@ jobs:
 
   #[PUSH GH]
   push-gh-nuget:
-    if: ${{ inputs.nugetghupload }}
+    if: ${{ inputs.nuget-gh-upload }}
     needs: [build]
     runs-on: ubuntu-latest
     permissions:
@@ -289,7 +303,7 @@ jobs:
 
   #[PUSH S3]
   push-s3-nuget:
-    if: ${{ inputs.nugets3upload }}
+    if: ${{ inputs.nuget-s3-upload }}
     needs: [build]
     runs-on: ubuntu-latest
     env:
@@ -302,9 +316,9 @@ jobs:
 
       - name: Push to S3 nuget repository
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
-          AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
+          AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
         run: |
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
@@ -329,7 +343,7 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !inputs.forceassemblyversion }}      
+        if: ${{ !inputs.force-assembly-version }}      
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.tag-version }}
@@ -343,11 +357,11 @@ jobs:
           omitNameDuringUpdate: true
           
       - name: Print Release Info
-        if: ${{ !inputs.forceassemblyversion }}
+        if: ${{ !inputs.force-assembly-version }}
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
           
       - name: Create a GitHub release (w/o Version Bump)
-        if: ${{ inputs.forceassemblyversion }}      
+        if: ${{ inputs.force-assembly-version }}      
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
@@ -361,7 +375,7 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Print Release Info
-        if: ${{ inputs.forceassemblyversion }}      
+        if: ${{ inputs.force-assembly-version }}      
         run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
 
   # Nexus Upload
@@ -388,11 +402,9 @@ jobs:
         env:
           UNEX_GAME: valheim
           UNEX_DEBUG: true
-          UNEX_APIKEY: ${{ secrets.nxapikey }} # UNEX_API_KEY
-          UNEX_COOKIES: ${{ secrets.nxcookiesheader }} # UNEX_COOKIES
+          UNEX_APIKEY: ${{ secrets.nexus-api-key }} # UNEX_API_KEY
+          UNEX_COOKIES: ${{ secrets.nexus-cookies-header }} # UNEX_COOKIES
  
         run: |
-          dotnet unex upload ${{ inputs.nxid }} {{ inputs.artifactName }} -v ${{ inputs.artifactVersion }}
-          dotnet unex changelog "Test Change" ${{ inputs.artifactVersion }} -m ${{ inputs.nxid }} -g "valheim"
-
-
+          dotnet unex upload ${{ inputs.nexus-mod-id }} {{ inputs.artifactName }} -v ${{ inputs.artifactVersion }}
+          dotnet unex changelog "Test Change" ${{ inputs.artifactVersion }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
