@@ -37,6 +37,12 @@ on:
         default: false
         type: boolean
 
+      create-github-release:
+        description: 'Create a github release.'
+        required: false
+        default: true
+        type: boolean
+
       aws-region:
         description: 'AWS Region'
         required: false
@@ -107,12 +113,13 @@ jobs:
           echo "::notice title=unit-test-path::${{ inputs.unit-test-path }}"
           echo "::notice title=skip-unit-tests::${{ inputs.skip-unit-tests }}"
           echo "::notice title=force-assembly-version::${{ inputs.force-assembly-version }}"
+          echo "::notice title=create-github-release::${{ inputs.create-github-release }}"
           echo "::notice title=aws-region::${{ inputs.aws-region }}"
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-          echo "::notice title=aws-access-key-id::${{ inputs.aws-access-key-id }}"
+          echo "::notice title=aws-access-key-id::${{ inputs.aws-access-key-id && inputs.aws-access-key-id != ''  }}"
 
   #[BUILD]
   build:
@@ -328,7 +335,7 @@ jobs:
   publish:
     needs: [build]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' && input.create-github-release }}
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
@@ -380,7 +387,7 @@ jobs:
 
   # Nexus Upload
   nexusupload:
-    name: Upload to Nexus Mods
+    needs: [build]
     runs-on: ubuntu-latest
     if: ${{ false }} 
     steps:
