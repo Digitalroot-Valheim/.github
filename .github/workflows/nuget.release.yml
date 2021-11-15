@@ -102,6 +102,15 @@ jobs:
     name: Pre-Build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Assembly Version
+        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
+        id: get-version
+        with:
+          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
+
       - name: Setup Variables
         id: vars
         env:
@@ -144,19 +153,9 @@ jobs:
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
         run: echo "$STEPS_CONTEXT"
-
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Get Assembly Version
-        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
-        id: get-version
-        with:
-          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
           
       - name: Print Assembly Version  
         run : |
-          
           echo "version ${{steps.get-version.outputs.version}}"
           echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
           echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
