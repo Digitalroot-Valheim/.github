@@ -1,0 +1,43 @@
+name: NuGet Release
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: 'Name of artifact to download, defaults to nuget-package'
+        default: 'nuget-package'
+        required: false
+        type: string
+
+      nuget-repo-url:
+        description: 'Url of the github nuget repo, defaults to https://nuget.pkg.github.com/Digitalroot-Valheim/index.json'
+        default: 'https://nuget.pkg.github.com/Digitalroot-Valheim/index.json'
+        required: false
+        type: string
+ 
+env:
+  NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  #[PUSH GH]
+  push-gh-nuget:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Download nuget package
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifact-name }}
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '6.0.x'
+          source-url: ${{ inputs.nuget-repo-url }}
+
+      - name: Push to GH nuget repository
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate

@@ -37,52 +37,6 @@ on:
         default: false
         type: boolean
 
-      awsregion:
-        description: 'AWS Region'
-        required: false
-        default: 'us-west-2'
-        type: string
-
-      nugetghupload:
-        description: 'Upload the nuget package to gh nuget repo.'
-        required: false
-        default: false
-        type: boolean
-
-      nugets3upload:
-        description: 'Upload the nuget package to S3 nuget repo.'
-        required: false
-        default: false
-        type: boolean
-
-      nxupload:
-        description: 'Upload Mod to Nexus'
-        required: false
-        default: false
-        type: boolean
-        
-      nxid:
-        description: 'Nexus Id for the mod.'
-        required: false
-        type: number
-
-    secrets:
-      awsaccesskeyid:
-        description: 'AWS Access Key Id'
-        required: false
-        
-      awssecretaccesskey:
-        description: 'AWS Secret Access Key'      
-        required: false
-        
-      nxapikey:
-        description: 'Nexus Api key'
-        required: false
-        
-      nxcookiesheader:
-        description: 'Nexus Cookie Header'
-        required: false
-
 env:
   SLN_FILE_NAME: ${{ inputs.slnfilename }}.sln
   PROJ: ${{ inputs.projfilename }}
@@ -92,17 +46,9 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
-  #[PREBUILD]
-  prebuild:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
   #[BUILD]
   build:
-    needs: [prebuild]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -146,6 +92,16 @@ jobs:
           echo "assembly-version ${{steps.get-version.outputs.assembly-version}}" 
           echo "file-version ${{steps.get-version.outputs.file-version}}" 
           echo "informational-version ${{steps.get-version.outputs.informational-version}}"         
+
+      - name: Setup Variables
+        id: vars
+        env:
+          LC_ALL: en_US.utf8
+        run: |
+          echo ::set-output name=artifactName::Plugin release ${{ needs.version.outputs.tag }}
+          echo ::set-output name=artifact::Plugin_release_${{ needs.version.outputs.tag }}.zip
+          echo ::set-output name=filename::${{ steps.config.outputs.filename }}.dll
+          echo ::set-output name=solution::${{ steps.config.outputs.filename }}.sln
 
       - name: Get Previous tag
         uses: actions-ecosystem/action-get-latest-tag@2ddc5e77f49bfdf508d612c5311867985fe5d59c
@@ -261,139 +217,3 @@ jobs:
           list-tests: 'all'
           max-annotations: '50'
           fail-on-error: false
-
-  #[PUSH GH]
-  push-gh-nuget:
-    if: ${{ inputs.nugetghupload }}
-    needs: [build]
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
-    steps:
-      - name: Download nuget package
-        uses: actions/download-artifact@v2
-        with:
-          name: nuget-package
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
-        with:
-          dotnet-version: '6.0.x'
-          source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
-
-      - name: Push to GH nuget repository
-        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate
-
-  #[PUSH S3]
-  push-s3-nuget:
-    if: ${{ inputs.nugets3upload }}
-    needs: [build]
-    runs-on: ubuntu-latest
-    env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
-    steps:
-      - name: Download nuget package
-        uses: actions/download-artifact@v2
-
-      - name: Push to S3 nuget repository
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.awsaccesskeyid }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.awssecretaccesskey }}
-          AWS_DEFAULT_REGION: ${{ inputs.awsregion }}
-        run: |
-          dotnet tool install -g sleet
-          sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
-          sleet retention prune --config $GITHUB_WORKSPACE/sleet-config/sleet.json
-
-  #[PUBLISH]
-  publish:
-    needs: [build]
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    steps:
-      - name: Download nuget package
-        uses: actions/download-artifact@v2
-        with:
-          name: nuget-package
-
-      - name: Build Release Notes
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v5.6
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: false
-
-      - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !inputs.forceassemblyversion }}      
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.build.outputs.tag-version }}
-          name: Release ${{ needs.build.outputs.tag-version }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit: main
-          artifacts: ${{ github.workspace }}/*.nupkg
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-          
-      - name: Print Release Info
-        if: ${{ !inputs.forceassemblyversion }}
-        run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
-          
-      - name: Create a GitHub release (w/o Version Bump)
-        if: ${{ inputs.forceassemblyversion }}      
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.build.outputs.assembly-version }}
-          name: Release ${{ needs.build.outputs.assembly-version }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit: main
-          artifacts: ${{ github.workspace }}/*.nupkg
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-
-      - name: Print Release Info
-        if: ${{ inputs.forceassemblyversion }}      
-        run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
-
-  # Nexus Upload
-  nexusupload:
-    name: Upload to Nexus Mods
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        id: download
-        with:
-          name: ${{ inputs.artifactName }}
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
-        with:
-          dotnet-version: '6.0.x'
-
-      - name: Restore tools
-        run: dotnet tool install -g nexusuploader
-
-      - name: Upload
-        env:
-          UNEX_GAME: valheim
-          UNEX_DEBUG: true
-          UNEX_APIKEY: ${{ secrets.nxapikey }} # UNEX_API_KEY
-          UNEX_COOKIES: ${{ secrets.nxcookiesheader }} # UNEX_COOKIES
- 
-        run: |
-          dotnet unex upload ${{ inputs.nxid }} {{ inputs.artifactName }} -v ${{ inputs.artifactVersion }}
-          dotnet unex changelog "Test Change" ${{ inputs.artifactVersion }} -m ${{ inputs.nxid }} -g "valheim"
-
-
