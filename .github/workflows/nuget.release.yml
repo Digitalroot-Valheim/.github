@@ -124,6 +124,10 @@ jobs:
 
       - name: Log Inputs and Variables
         run: | 
+          echo "::notice title=nuget-gh-upload::'${{ steps.vars.outputs.nuget-gh-upload }}'"
+          echo "::notice title=nuget-s3-upload::'${{ steps.vars.outputs.nuget-s3-upload }}'"
+          echo "::notice title=nexus-enable-upload::'${{ steps.vars.outputs.nexus-enable-upload }}'"
+          echo "::notice title=nexus-mod-id::'id_${{ steps.vars.outputs.nexus-mod-id }}'"
           echo "::notice title=date::${{ steps.vars.outputs.date }}"
           echo "::notice title=sln-file-name::${{ steps.vars.outputs.sln-file-name }}"
           echo "::notice title=proj-file-name::${{ steps.vars.outputs.proj-file-name }}"
@@ -133,10 +137,15 @@ jobs:
           echo "::notice title=force-assembly-version::${{ steps.vars.outputs.force-assembly-version }}"
           echo "::notice title=create-github-release::${{ steps.vars.outputs.create-github-release }}"
           echo "::notice title=aws-region::${{ steps.vars.outputs.aws-region }}"
-          echo "::notice title=nuget-gh-upload::'${{ steps.vars.outputs.nuget-gh-upload }}'"
-          echo "::notice title=nuget-s3-upload::'${{ steps.vars.outputs.nuget-s3-upload }}'"
-          echo "::notice title=nexus-enable-upload::'${{ steps.vars.outputs.nexus-enable-upload }}'"
-          echo "::notice title=nexus-mod-id::'id_${{ steps.vars.outputs.nexus-mod-id }}'"
+
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
 
   #[BUILD]
   build:
