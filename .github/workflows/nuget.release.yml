@@ -130,6 +130,12 @@ jobs:
           echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
           echo "::set-output name=version::${{ steps.get-version.outputs.version }}"
+          echo "::set-output name=version-prefix::${{ steps.get-version.outputs.version-prefix }}"
+          echo "::set-output name=version-suffix::${{ steps.get-version.outputs.version-suffix }}"
+          echo "::set-output name=package-version::${{ steps.get-version.outputs.package-version }}"
+          echo "::set-output name=assembly-version::${{ steps.get-version.outputs.assembly-version }}"
+          echo "::set-output name=file-version::${{ steps.get-version.outputs.file-version }}"
+          echo "::set-output name=informational-version::${{ steps.get-version.outputs.informational-version }}"
 
       - name: Log Inputs
         run: | 
@@ -148,26 +154,22 @@ jobs:
         run: | 
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+         
+      - name: Log Variables
+        run: | 
+          echo "::notice title=date::${{ steps.vars.outputs.date }}"
+          echo "::notice title=version::${{ steps.vars.outputs.version }}"
+          echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
+          echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
+          echo "::notice title=package-version::${{ steps.vars.outputs.package-version }}"
+          echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
+          echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
+          echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
 
       - name: Dump steps context
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
         run: echo "$STEPS_CONTEXT"
-          
-      - name: Print Assembly Version  
-        run : |
-          echo "version ${{steps.get-version.outputs.version}}"
-          echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
-          echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
-          echo "package-version ${{steps.get-version.outputs.package-version}}" 
-          echo "assembly-version ${{steps.get-version.outputs.assembly-version}}" 
-          echo "file-version ${{steps.get-version.outputs.file-version}}" 
-          echo "informational-version ${{steps.get-version.outputs.informational-version}}" 
-
-      - name: Log Variables
-        run: | 
-          echo "::notice title=date::${{ steps.vars.outputs.date }}"
-          echo "::notice title=version::${{ steps.vars.outputs.version }}"
 
   #[BUILD]
   build:
