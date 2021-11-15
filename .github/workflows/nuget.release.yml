@@ -136,7 +136,7 @@ jobs:
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
-          echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::notice title=nexus-mod-id::id_${{ inputs.nexus-mod-id }}"
 
   #[BUILD]
   build:
