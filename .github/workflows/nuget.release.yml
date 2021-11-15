@@ -98,6 +98,7 @@ env:
 jobs:
   #[PREBUILD]
   prebuild:
+    name: Pre-Build
     runs-on: ubuntu-latest
     steps:
       - name: Get current date
@@ -120,6 +121,7 @@ jobs:
 
   #[BUILD]
   build:
+    name: Build
     needs: [prebuild]
     runs-on: ubuntu-latest
     permissions:
@@ -250,6 +252,7 @@ jobs:
          
   #[POSTBUILD]
   postbuild:
+    name: Post-Build
     if: ${{ !inputs.skip-unit-tests }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -281,6 +284,7 @@ jobs:
 
   #[PUSH GH]
   push-gh-nuget:
+    name: Push nuget package to github repo
     if: ${{ inputs.nuget-gh-upload }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -307,6 +311,7 @@ jobs:
 
   #[PUSH S3]
   push-s3-nuget:
+    name: Push nuget package to S3 repo
     if: ${{ inputs.nuget-s3-upload }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -330,6 +335,7 @@ jobs:
 
   #[PUBLISH]
   publish:
+    name: Create github release
     needs: [build]
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
@@ -384,6 +390,7 @@ jobs:
 
   # Nexus Upload
   nexusupload:
+    name: Upload to Nexus
     needs: [build]
     runs-on: ubuntu-latest
     if: ${{ false }} 
