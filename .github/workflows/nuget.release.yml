@@ -106,6 +106,7 @@ jobs:
         env:
           LC_ALL: en_US.utf8
         run: |
+          echo "::set-output name=date::$(date +'%Y%m%d')"
           echo "::set-output name=sln-file-name::${{ inputs.sln-file-name }}"
           echo "::set-output name=proj-file-name::${{ inputs.proj-file-name }}"
           echo "::set-output name=src-path::${{ inputs.src-path }}"
@@ -118,10 +119,11 @@ jobs:
           echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-          echo "::set-output name=date::$(date +'%Y-%m-%d')"
+          
 
       - name: Log Inputs and Variables
         run: | 
+          echo "::notice title=date::${{ steps.vars.outputs.date }}"
           echo "::notice title=sln-file-name::${{ inputs.sln-file-name }}"
           echo "::notice title=proj-file-name::${{ inputs.proj-file-name }}"
           echo "::notice title=src-path::${{ inputs.src-path }}"
@@ -134,7 +136,6 @@ jobs:
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-          echo "::notice title=date::${{ steps.vars.outputs.date }}"
 
   #[BUILD]
   build:
