@@ -266,7 +266,27 @@ jobs:
   push-gh-nuget:
     if: ${{ inputs.nugetghupload }}
     needs: [build]
-    uses: Digitalroot-Valheim/.github/.github/workflows/push.gh.nuget.yml@main
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - name: Download nuget package
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-package
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '6.0.x'
+          source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
+
+      - name: Push to GH nuget repository
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate
 
   #[PUSH S3]
   push-s3-nuget:
