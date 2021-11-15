@@ -230,7 +230,6 @@ jobs:
           dotnet tool install -g sleet
           sleet push $NUGET_PACKAGES --skip-existing --config $GITHUB_WORKSPACE/sleet.json
          
-
   #[POSTBUILD]
   postbuild:
     if: ${{ !inputs.skipunittest }}
@@ -369,7 +368,7 @@ jobs:
   nexusupload:
     name: Upload to Nexus Mods
     runs-on: ubuntu-latest
-
+    if: ${{ false }} 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
