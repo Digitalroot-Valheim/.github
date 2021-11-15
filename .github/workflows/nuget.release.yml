@@ -90,8 +90,6 @@ on:
         required: false
 
 env:
-  SLN_FILE_NAME: ${{ inputs.sln-file-name }}.sln
-  PROJ: ${{ inputs.proj-file-name }}
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -119,7 +117,6 @@ jobs:
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-          echo "::notice title=aws-access-key-id::${{ inputs.aws-access-key-id && inputs.aws-access-key-id != ''  }}"
 
   #[BUILD]
   build:
@@ -150,13 +147,13 @@ jobs:
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
-        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} --nologo -v d
+        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln --nologo -v d
         
       - name: Get Assembly Version
         uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
         id: get-version
         with:
-          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj
+          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
           
       - name: Print Assembly Version          
         run : |
@@ -191,15 +188,15 @@ jobs:
 
       - name: Build (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Build (w/o Version Bump)
         if: ${{ inputs.force-assembly-version }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --nologo -v n
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Test
         if: ${{ !inputs.skip-unit-tests }}
-        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.SLN_FILE_NAME }} -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
+        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/$${{ inputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
@@ -211,24 +208,24 @@ jobs:
 
       - name: Pack Release (w/ Version Bump)
         if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Pack Release (w/o Version Bump)
         if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
 
       - name: Pack PreRelease (w/ Version Bump)
         if: ${{ github.ref != 'refs/heads/main' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
 
       - name: Pack PreRelease (w/o Version Bump)
         if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ env.PROJ }}/${{ env.PROJ }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix build-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
         uses: actions/upload-artifact@v2
         with:
-          path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ env.PROJ }}/bin/Release/*.nupkg
+          path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/bin/Release/*.nupkg
           name: nuget-package
           retention-days: 1
 
