@@ -101,10 +101,26 @@ jobs:
     name: Pre-Build
     runs-on: ubuntu-latest
     steps:
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      - name: Log Inputs
+      - name: Setup Variables
+        id: vars
+        env:
+          LC_ALL: en_US.utf8
+        run: |
+          echo "::set-output name=sln-file-name::${{ inputs.sln-file-name }}"
+          echo "::set-output name=proj-file-name::${{ inputs.proj-file-name }}"
+          echo "::set-output name=src-path::${{ inputs.src-path }}"
+          echo "::set-output name=unit-test-path::${{ inputs.unit-test-path }}"
+          echo "::set-output name=skip-unit-tests::${{ inputs.skip-unit-tests }}"
+          echo "::set-output name=force-assembly-version::${{ inputs.force-assembly-version }}"
+          echo "::set-output name=create-github-release::${{ inputs.create-github-release }}"
+          echo "::set-output name=aws-region::${{ inputs.aws-region }}"
+          echo "::set-output name=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
+          echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+          echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
+          echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Log Inputs and Variables
         run: | 
           echo "::notice title=sln-file-name::${{ inputs.sln-file-name }}"
           echo "::notice title=proj-file-name::${{ inputs.proj-file-name }}"
@@ -118,6 +134,7 @@ jobs:
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::notice title=date::${{ steps.vars.outputs.date }}"
 
   #[BUILD]
   build:
