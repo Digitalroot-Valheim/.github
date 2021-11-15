@@ -1,0 +1,59 @@
+name: Nexus Upload
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        description: 'Name of artifact to upload.'
+        required: true
+        type: string
+        
+      nxid:
+        description: 'Nexus Id for the mod.'
+        required: true
+        type: number
+  
+  nexusupload:
+    name: Upload to Nexus Mods
+    runs-on: windows-latest
+    env:
+      secretsAreSet: ${{ secrets.UNEX_API_KEY && secrets.UNEX_COOKIES }}
+
+    steps:
+      - name: Checkout for restoring tools
+        if: env.secretsAreSet
+        uses: actions/checkout@v2
+
+      - name: Download artifact
+        if: env.secretsAreSet
+        uses: actions/download-artifact@v2
+        id: download
+        with:
+          name: ${{ inputs.artifactName }}
+
+      - name: Setup .NET Core SDK
+        if: env.secretsAreSet      
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore tools
+        if: env.secretsAreSet
+        run: dotnet tool restore
+
+      - name: Upload
+        if: env.secretsAreSet
+        run: >
+          dotnet unex upload
+          ${{ needs.build.outputs.modid }}
+          ${{ steps.download.outputs.download-path }}/${{ needs.build.outputs.artifact }}
+          -v ${{ needs.version.outputs.version }}
+          dotnet unex changelog
+          ${{ needs.version.outputs.version }}
+          "$CHANGELOG_BODY"
+          -m ${{ needs.build.outputs.modid }}
+        env:
+          UNEX_DEBUG: true
+          UNEX_APIKEY: ${{ secrets.UNEX_API_KEY }}
+          UNEX_COOKIES: ${{ secrets.UNEX_COOKIES }}
+          CHANGELOG_BODY: "${{ needs.version.outputs.clean_changelog }}"
