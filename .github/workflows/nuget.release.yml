@@ -217,7 +217,7 @@ jobs:
 
       - name: Test
         if: ${{ !inputs.skip-unit-tests }}
-        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/$${{ inputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
+        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
