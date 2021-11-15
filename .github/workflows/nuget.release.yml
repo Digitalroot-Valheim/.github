@@ -1,4 +1,4 @@
-name: NuGet Release
+name: Build, Test and Release
 
 on:
   workflow_call:
