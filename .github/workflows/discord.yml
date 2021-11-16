@@ -1,0 +1,59 @@
+name: Discord Webhook
+
+on:
+  workflow_call:
+    inputs:
+      repo_name:
+        description: 'Name of Github repo.'
+        required: true
+        type: string
+
+    secrets:
+      webhook_url:
+        description: 'Discord Webhook URL.'
+        required: false
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Discord Webhook
+      uses: johnnyhuy/actions-discord-git-webhook@main
+      with:
+        webhook_url: ${{ secrets.webhook_url }}
+        hide_links: false
+        censor_username: false
+        repo_name: ${{ inputs.repo_name }}
+       
+    # Disable URL links to the repository
+    # 
+    # - name: Run Discord Webhook
+    #   uses: johnnyhuy/discord-webhook@main
+    #   with:
+    #     webhook_url: ${{ secrets.YOUR_DISCORD_WEBHOOK_URL }}
+    #     hide_links: true
+
+    # Censor username
+    # 
+    # - name: Run Discord Webhook
+    #   uses: johnnyhuy/discord-webhook@main
+    #   with:
+    #     webhook_url: ${{ secrets.YOUR_DISCORD_WEBHOOK_URL }}
+    #     censor_username: false
+
+    # Using an ID and token
+    # 
+    # - name: Run Discord Webhook
+    #   uses: johnnyhuy/discord-webhook@main
+    #   with:
+    #     id: ${{ secrets.YOUR_DISCORD_WEBHOOK_ID }}
+    #     token: ${{ secrets.YOUR_DISCORD_WEBHOOK_TOKEN }}
+
+    # Using a custom repo name
+    # 
+    # - name: Run Discord Webhook
+    #   uses: johnnyhuy/discord-webhook@main
+    #   with:
+    #     id: ${{ secrets.YOUR_DISCORD_WEBHOOK_ID }}
+    #     token: ${{ secrets.YOUR_DISCORD_WEBHOOK_TOKEN }}
+    #     repo_name: My Special Repo
