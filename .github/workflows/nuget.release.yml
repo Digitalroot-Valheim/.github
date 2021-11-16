@@ -346,7 +346,7 @@ jobs:
   push-gh-nuget:
     name: Push nuget package to github repo
     needs: [prebuild, build]
-    if: ${{ needs.prebuild.outputs.nuget-gh-upload }}
+    if: needs.prebuild.outputs.nuget-gh-upload
     runs-on: ubuntu-latest
     permissions:
       packages: write
