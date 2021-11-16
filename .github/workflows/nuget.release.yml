@@ -397,7 +397,7 @@ jobs:
     name: Create github release
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && inputs.create-github-release
+    if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
