@@ -354,7 +354,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
-      - run: echo "needs.prebuild.outputs.nuget-gh-upload = ${{ needs.prebuild.outputs.nuget-gh-upload }}"
       - name: Download nuget package
         uses: actions/download-artifact@v2
         with:
@@ -380,7 +379,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
-      - run: echo "needs.prebuild.outputs.nuget-s3-upload = ${{ needs.prebuild.outputs.nuget-s3-upload }}"
       - name: Download nuget package
         uses: actions/download-artifact@v2
 
@@ -478,5 +476,5 @@ jobs:
           UNEX_COOKIES: ${{ secrets.nexus-cookies-header }} # UNEX_COOKIES
  
         run: |
-          dotnet unex upload ${{ needs.prebuild.outputs.nexus-mod-id }} {{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
-          dotnet unex changelog "Test Change" ${{ needs.prebuild.outputs.artifactVersion }} -m ${{ needs.prebuild.outputs.nexus-mod-id }} -g "valheim"
+          unex upload ${{ inputs.nexus-mod-id }} {{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
+          unex changelog "Test Change" ${{ needs.prebuild.outputs.artifactVersion }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
