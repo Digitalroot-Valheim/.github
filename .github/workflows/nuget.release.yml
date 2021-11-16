@@ -313,7 +313,7 @@ jobs:
   #[POSTBUILD]
   postbuild:
     name: Post-Build
-    if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
+    if: needs.prebuild.outputs.skip-unit-tests == false
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     steps:
@@ -330,7 +330,6 @@ jobs:
           ls -la ${{ github.workspace }}
 
       - name: Test Reporter
-        if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
         uses: dorny/test-reporter@v1.5.0
         with:
           name: NUnit Tests                              # Name of the check run which will be created
@@ -346,7 +345,7 @@ jobs:
   push-gh-nuget:
     name: Push nuget package to github repo
     needs: [prebuild, build]
-    if: needs.prebuild.outputs.nuget-gh-upload
+    if: needs.prebuild.outputs.nuget-gh-upload == true
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -374,7 +373,7 @@ jobs:
   push-s3-nuget:
     name: Push nuget package to S3 repo
     needs: [prebuild, build]
-    if: ${{ needs.prebuild.outputs.nuget-s3-upload }}
+    if: needs.prebuild.outputs.nuget-s3-upload == true
     runs-on: ubuntu-latest
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -400,7 +399,7 @@ jobs:
     name: Create github release
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && needs.prebuild.outputs.create-github-release }}
+    if: github.ref == 'refs/heads/main' && needs.prebuild.outputs.create-github-release == true
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
@@ -415,7 +414,7 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !needs.prebuild.outputs.force-assembly-version }}      
+        if: needs.prebuild.outputs.force-assembly-version == false
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
@@ -429,11 +428,11 @@ jobs:
           omitNameDuringUpdate: true
           
       - name: Print Release Info
-        if: ${{ !needs.prebuild.outputs.force-assembly-version }}
+        if: needs.prebuild.outputs.force-assembly-version == false
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
           
       - name: Create a GitHub release (w/o Version Bump)
-        if: ${{ needs.prebuild.outputs.force-assembly-version }}      
+        if: needs.prebuild.outputs.force-assembly-version == true
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
@@ -447,7 +446,7 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Print Release Info
-        if: ${{ needs.prebuild.outputs.force-assembly-version }}      
+        if: needs.prebuild.outputs.force-assembly-version == true
         run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
 
   # Nexus Upload
@@ -455,7 +454,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: ${{ false }} 
+    if: false == false
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
