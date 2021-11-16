@@ -218,6 +218,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
         
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+
       - name: Build (w/ Version Bump)
         if: ${{ !needs.prebuild.outputs.force-assembly-version }}
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
