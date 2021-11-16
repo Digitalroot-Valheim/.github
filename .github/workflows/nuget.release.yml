@@ -198,13 +198,13 @@ jobs:
       - name: Log Variables
         run: | 
           echo "::notice title=date::${{ steps.vars.outputs.date }}"
-          echo "::notice title=version::${{ steps.vars.outputs.version }}"
-          echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
-          echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
-          echo "::notice title=package-version::${{ steps.vars.outputs.package-version }}"
-          echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
-          echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
-          echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
+          #echo "::notice title=version::${{ steps.vars.outputs.version }}"
+          #echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
+          #echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
+          #echo "::notice title=package-version::${{ steps.vars.outputs.package-version }}"
+          #echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
+          #echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
+          #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
           echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
           echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
 
