@@ -414,7 +414,7 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: not needs.prebuild.outputs.force-assembly-version
+        if: needs.prebuild.outputs.force-assembly-version == false
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
