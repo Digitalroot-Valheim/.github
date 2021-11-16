@@ -1,5 +1,7 @@
 name: Build, Test and Release
 
+concurrency: ci-${{ github.ref }}
+
 on:
   workflow_call:
     inputs:
@@ -101,6 +103,31 @@ jobs:
   prebuild:
     name: Pre-Build
     runs-on: ubuntu-latest
+
+    outputs:
+      sln-file-name: ${{ steps.env.outputs.sln-file-name }}
+      proj-file-name: ${{ steps.env.outputs.proj-file-name }}
+      src-path: ${{ steps.env.outputs.src-path }}
+      unit-test-path: ${{ steps.env.outputs.unit-test-path }}
+      skip-unit-tests: ${{ steps.env.outputs.skip-unit-tests }}
+      force-assembly-version: ${{ steps.env.outputs.force-assembly-version }}
+      create-github-release: ${{ steps.env.create-github-release }}
+      aws-region: ${{ steps.env.outputs.aws-region }}
+      nuget-gh-upload: ${{ steps.env.outputs.nuget-gh-upload }}
+      nuget-s3-upload: ${{ steps.env.outputs.nuget-s3-upload }}
+      nexus-enable-upload: ${{ steps.env.outputs.nexus-enable-upload }}
+      nexus-mod-id: ${{ steps.env.outputs.nexus-mod-id }}
+      date: ${{ steps.env.outputs.date }}
+      version: ${{ steps.env.outputs.version }}
+      version-prefix: ${{ steps.env.outputs.version-prefix }}
+      version-suffix: ${{ steps.env.outputs.version-suffix }}
+      package-version: ${{ steps.env.outputs.package-version }}
+      assembly-version: ${{ steps.env.outputs.assembly-version }}
+      file-version: ${{ steps.env.outputs.file-version }}
+      informational-version: ${{ steps.env.outputs.informational-version }}
+      previous-tag: ${{ steps.env.outputs.previous-tag }}
+      next-tag: ${{ steps.env.outputs.next-tag }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
