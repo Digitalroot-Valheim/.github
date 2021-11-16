@@ -249,11 +249,11 @@ jobs:
         run: echo "$STEPS_CONTEXT"
 
       - name: Build (w/ Version Bump)
-        if: ${{ !needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ !inputs.force-assembly-version }}
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Build (w/o Version Bump)
-        if: ${{ needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ inputs.force-assembly-version }}
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Test
@@ -269,19 +269,19 @@ jobs:
           retention-days: 1
 
       - name: Pack Release (w/ Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && !needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Pack Release (w/o Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Pack PreRelease (w/ Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && !needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ github.ref != 'refs/heads/main' && !inputs.force-assembly-version }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} --version-suffix ${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Pack PreRelease (w/o Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && needs.prebuild.outputs.force-assembly-version }}
+        if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} --version-suffix ${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
@@ -414,7 +414,7 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: needs.prebuild.outputs.force-assembly-version == false
+        if: ${{ !inputs.force-assembly-version }}
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
@@ -428,11 +428,11 @@ jobs:
           omitNameDuringUpdate: true
           
       - name: Print Release Info
-        if: needs.prebuild.outputs.force-assembly-version == false
+        if: ${{ !inputs.force-assembly-version }}
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
           
       - name: Create a GitHub release (w/o Version Bump)
-        if: needs.prebuild.outputs.force-assembly-version == true
+        if: inputs.force-assembly-version
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
@@ -446,7 +446,7 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Print Release Info
-        if: needs.prebuild.outputs.force-assembly-version == true
+        if: inputs.force-assembly-version
         run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
 
   # Nexus Upload
