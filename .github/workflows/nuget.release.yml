@@ -323,7 +323,7 @@ jobs:
   #[POSTBUILD]
   postbuild:
     name: Post-Build
-    if: needs.prebuild.outputs.skip-unit-tests == false
+    if: inputs.skip-unit-tests
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     steps:
@@ -355,7 +355,7 @@ jobs:
   push-gh-nuget:
     name: Push nuget package to github repo
     needs: [prebuild, build]
-    if: needs.prebuild.outputs.nuget-gh-upload == true
+    if: inputs.nuget-gh-upload
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -383,7 +383,7 @@ jobs:
   push-s3-nuget:
     name: Push nuget package to S3 repo
     needs: [prebuild, build]
-    if: needs.prebuild.outputs.nuget-s3-upload == true
+    if: inputs.nuget-s3-upload
     runs-on: ubuntu-latest
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -409,7 +409,7 @@ jobs:
     name: Create github release
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && needs.prebuild.outputs.create-github-release == true
+    if: github.ref == 'refs/heads/main' && inputs.create-github-release
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
@@ -464,7 +464,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: needs.prebuild.outputs.nexus-enable-upload == true
+    if: inputs.nexus-enable-upload
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
