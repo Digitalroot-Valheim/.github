@@ -1,7 +1,5 @@
 name: Build, Test and Release
 
-concurrency: ci-${{ github.ref }}
-
 on:
   workflow_call:
     inputs:
