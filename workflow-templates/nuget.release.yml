@@ -1,4 +1,6 @@
-name: NuGet Release
+name: Release
+
+concurrency: ci-${{ github.ref }}
 
 on:
   push:
