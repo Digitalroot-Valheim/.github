@@ -345,8 +345,8 @@ jobs:
   #[PUSH GH]
   push-gh-nuget:
     name: Push nuget package to github repo
-    if: ${{ needs.prebuild.outputs.nuget-gh-upload }}
     needs: [prebuild, build]
+    if: ${{ needs.prebuild.outputs.nuget-gh-upload }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -355,6 +355,7 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
+      - run: echo "needs.prebuild.outputs.nuget-gh-upload = ${{ needs.prebuild.outputs.nuget-gh-upload }}"
       - name: Download nuget package
         uses: actions/download-artifact@v2
         with:
@@ -372,14 +373,15 @@ jobs:
   #[PUSH S3]
   push-s3-nuget:
     name: Push nuget package to S3 repo
-    if: ${{ needs.prebuild.outputs.nuget-s3-upload }}
     needs: [prebuild, build]
+    if: ${{ needs.prebuild.outputs.nuget-s3-upload }}
     runs-on: ubuntu-latest
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
+      - run: echo "needs.prebuild.outputs.nuget-s3-upload = ${{ needs.prebuild.outputs.nuget-s3-upload }}"
       - name: Download nuget package
         uses: actions/download-artifact@v2
 
