@@ -12,9 +12,14 @@ on:
       webhook_url:
         description: 'Discord Webhook URL.'
         required: false
+
+env:
+  TIMEOUT: 5
+
 jobs:
   discord:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - uses: actions/checkout@v2
     - name: Run Discord Webhook

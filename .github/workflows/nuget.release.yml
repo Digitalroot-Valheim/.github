@@ -101,7 +101,7 @@ jobs:
   prebuild:
     name: Pre-Build
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
     outputs:
       sln-file-name: ${{ steps.vars.outputs.sln-file-name }}
       proj-file-name: ${{ steps.vars.outputs.proj-file-name }}
@@ -220,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
+    timeout-minutes: 5
     steps:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
@@ -311,6 +311,7 @@ jobs:
     if: ${{ !inputs.skip-unit-tests }}
     needs: [prebuild, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -342,6 +343,7 @@ jobs:
     needs: [prebuild, build]
     if: inputs.nuget-gh-upload
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       packages: write
     env:
@@ -369,6 +371,7 @@ jobs:
     needs: [prebuild, build]
     if: inputs.nuget-s3-upload
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -392,6 +395,7 @@ jobs:
     name: Create github release
     needs: [prebuild, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
     steps:
       - name: Download nuget package
@@ -447,6 +451,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload }}
     steps:
       - name: Download artifact
