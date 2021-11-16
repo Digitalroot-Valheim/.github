@@ -111,6 +111,19 @@ jobs:
         with:
           proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
 
+      - name: Get Previous tag
+        uses: actions-ecosystem/action-get-latest-tag@2ddc5e77f49bfdf508d612c5311867985fe5d59c
+        id: previoustag
+        with:
+          semver_only: true
+          initial_version: ${{steps.get-version.outputs.assembly-version}}          
+
+      - name: Get next minor version
+        uses: WyriHaximus/github-action-next-semvers@33d116a4c239252582a60a1ba8dbba63ad493ffd
+        id: semvers
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+
       - name: Setup Variables
         id: vars
         env:
@@ -136,6 +149,8 @@ jobs:
           echo "::set-output name=assembly-version::${{ steps.get-version.outputs.assembly-version }}"
           echo "::set-output name=file-version::${{ steps.get-version.outputs.file-version }}"
           echo "::set-output name=informational-version::${{ steps.get-version.outputs.informational-version }}"
+          echo "::set-output name=previous-tag::${{ steps.previoustag.outputs.tag }}"
+          echo "::set-output name=next-tag::${{ steps.semvers.outputs.patch }}"
 
       - name: Log Inputs
         run: | 
@@ -165,6 +180,8 @@ jobs:
           echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
           echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
           echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
+          echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
+          echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
 
       - name: Dump steps context
         env:
@@ -178,9 +195,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    outputs:
-      assembly-version: ${{ steps.get-version.outputs.assembly-version }}
-      tag-version: ${{ steps.semvers.outputs.patch }}
+
     steps:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
@@ -201,85 +216,48 @@ jobs:
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
-        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln --nologo -v d
+        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
         
-      - name: Get Assembly Version
-        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
-        id: get-version
-        with:
-          proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
-          
-      - name: Print Assembly Version          
-        run : |
-          echo "version ${{steps.get-version.outputs.version}}"
-          echo "version-prefix ${{steps.get-version.outputs.version-prefix}}" 
-          echo "version-suffix ${{steps.get-version.outputs.version-suffix}}" 
-          echo "package-version ${{steps.get-version.outputs.package-version}}" 
-          echo "assembly-version ${{steps.get-version.outputs.assembly-version}}" 
-          echo "file-version ${{steps.get-version.outputs.file-version}}" 
-          echo "informational-version ${{steps.get-version.outputs.informational-version}}"         
-
-      - name: Get Previous tag
-        uses: actions-ecosystem/action-get-latest-tag@2ddc5e77f49bfdf508d612c5311867985fe5d59c
-        id: previoustag
-        with:
-          semver_only: true
-          initial_version: ${{steps.get-version.outputs.assembly-version}}          
-
-      - name: Get next minor version
-        uses: WyriHaximus/github-action-next-semvers@33d116a4c239252582a60a1ba8dbba63ad493ffd
-        id: semvers
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-
-      - name: Print Info
-        run: | 
-          echo "::notice title=GITHUB_REF::$GITHUB_REF"
-          echo "::notice title=GITHUB_RUN_NUMBER::$GITHUB_RUN_NUMBER"
-          echo "::notice title='Previous Tag'::${{ steps.previoustag.outputs.tag }}"
-          echo "::notice title='Next Tag'::${{ steps.semvers.outputs.patch }}"          
-          echo "::notice title='Next Patch'::${{ steps.semvers.outputs.patch }}" 
-
       - name: Build (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ !needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Build (w/o Version Bump)
-        if: ${{ inputs.force-assembly-version }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --nologo -v n
+        if: ${{ needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Test
-        if: ${{ !inputs.skip-unit-tests }}
-        run: dotnet test $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
+        if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
+        run: dotnet test $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
-        if: ${{ !inputs.skip-unit-tests}}
+        if: ${{ !needs.prebuild.outputs.skip-unit-tests}}
         with:
-          path: ${{ github.workspace }}/${{ inputs.src-path }}/UnitTests/TestResults/test-results.trx
+          path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/UnitTests/TestResults/test-results.trx
           name: test-results
           retention-days: 1
 
       - name: Pack Release (w/ Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ github.ref == 'refs/heads/main' && !needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Pack Release (w/o Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} -v n
+        if: ${{ github.ref == 'refs/heads/main' && needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Pack PreRelease (w/ Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix ${{ steps.vars.outputs.date }}-$GITHUB_RUN_NUMBER -v n
+        if: ${{ github.ref != 'refs/heads/main' && !needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} --version-suffix ${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Pack PreRelease (w/o Version Bump)
-        if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ steps.semvers.outputs.patch }} --version-suffix ${{ steps.vars.outputs.date }}-$GITHUB_RUN_NUMBER -v n
+        if: ${{ github.ref != 'refs/heads/main' && needs.prebuild.outputs.force-assembly-version }}
+        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} --version-suffix ${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Save Package
         uses: actions/upload-artifact@v2
         with:
-          path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/bin/Release/*.nupkg
+          path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/bin/Release/*.nupkg
           name: nuget-package
           retention-days: 1
 
@@ -297,7 +275,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
-          AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+          AWS_DEFAULT_REGION: ${{ needs.prebuild.outputs.aws-region }}
         run: |
           dotnet tool install -g sleet
           sleet push $NUGET_PACKAGES --skip-existing --config $GITHUB_WORKSPACE/sleet.json
@@ -305,8 +283,8 @@ jobs:
   #[POSTBUILD]
   postbuild:
     name: Post-Build
-    if: ${{ !inputs.skip-unit-tests }}
-    needs: [build]
+    if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
+    needs: [prebuild, build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -322,7 +300,7 @@ jobs:
           ls -la ${{ github.workspace }}
 
       - name: Test Reporter
-        if: ${{ !inputs.skip-unit-tests }}
+        if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
         uses: dorny/test-reporter@v1.5.0
         with:
           name: NUnit Tests                              # Name of the check run which will be created
@@ -337,8 +315,8 @@ jobs:
   #[PUSH GH]
   push-gh-nuget:
     name: Push nuget package to github repo
-    if: ${{ inputs.nuget-gh-upload }}
-    needs: [build]
+    if: ${{ needs.prebuild.outputs.nuget-gh-upload }}
+    needs: [prebuild, build]
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -364,8 +342,8 @@ jobs:
   #[PUSH S3]
   push-s3-nuget:
     name: Push nuget package to S3 repo
-    if: ${{ inputs.nuget-s3-upload }}
-    needs: [build]
+    if: ${{ needs.prebuild.outputs.nuget-s3-upload }}
+    needs: [prebuild, build]
     runs-on: ubuntu-latest
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -379,7 +357,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
-          AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+          AWS_DEFAULT_REGION: ${{ needs.prebuild.outputs.aws-region }}
         run: |
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
@@ -388,9 +366,9 @@ jobs:
   #[PUBLISH]
   publish:
     name: Create github release
-    needs: [build]
+    needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.prebuild.outputs.create-github-release }}
     steps:
       - name: Download nuget package
         uses: actions/download-artifact@v2
@@ -405,11 +383,11 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version }}      
+        if: ${{ !needs.prebuild.outputs.force-assembly-version }}      
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ needs.build.outputs.tag-version }}
-          name: Release ${{ needs.build.outputs.tag-version }}
+          tag: v${{ needs.prebuild.outputs.next-tag }}
+          name: Release ${{ needs.prebuild.outputs.next-tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -419,11 +397,11 @@ jobs:
           omitNameDuringUpdate: true
           
       - name: Print Release Info
-        if: ${{ !inputs.force-assembly-version }}
+        if: ${{ !needs.prebuild.outputs.force-assembly-version }}
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
           
       - name: Create a GitHub release (w/o Version Bump)
-        if: ${{ inputs.force-assembly-version }}      
+        if: ${{ needs.prebuild.outputs.force-assembly-version }}      
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
@@ -437,13 +415,13 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Print Release Info
-        if: ${{ inputs.force-assembly-version }}      
+        if: ${{ needs.prebuild.outputs.force-assembly-version }}      
         run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
 
   # Nexus Upload
   nexusupload:
     name: Upload to Nexus
-    needs: [build]
+    needs: [prebuild, build]
     runs-on: ubuntu-latest
     if: ${{ false }} 
     steps:
@@ -451,7 +429,7 @@ jobs:
         uses: actions/download-artifact@v2
         id: download
         with:
-          name: ${{ inputs.artifactName }}
+          name: ${{ needs.prebuild.outputs.artifactName }}
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
@@ -469,5 +447,5 @@ jobs:
           UNEX_COOKIES: ${{ secrets.nexus-cookies-header }} # UNEX_COOKIES
  
         run: |
-          dotnet unex upload ${{ inputs.nexus-mod-id }} {{ inputs.artifactName }} -v ${{ inputs.artifactVersion }}
-          dotnet unex changelog "Test Change" ${{ inputs.artifactVersion }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
+          dotnet unex upload ${{ needs.prebuild.outputs.nexus-mod-id }} {{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
+          dotnet unex changelog "Test Change" ${{ needs.prebuild.outputs.artifactVersion }} -m ${{ needs.prebuild.outputs.nexus-mod-id }} -g "valheim"
