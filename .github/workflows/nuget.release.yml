@@ -454,7 +454,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    if: ${{ false }} 
+    if: needs.prebuild.outputs.nexus-enable-upload == true
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
