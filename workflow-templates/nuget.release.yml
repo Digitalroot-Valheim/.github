@@ -1,4 +1,4 @@
-name: Nuget Release
+name: Release
 
 concurrency: ci-${{ github.ref }}
 
