@@ -252,12 +252,12 @@ jobs:
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Test
-        if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
+        if: ${{ !inputs.skip-unit-tests }}
         run: dotnet test $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
         uses: actions/upload-artifact@v2
-        if: ${{ !needs.prebuild.outputs.skip-unit-tests}}
+        if: ${{ !inputs.skip-unit-tests }}
         with:
           path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/UnitTests/TestResults/test-results.trx
           name: test-results
@@ -308,7 +308,7 @@ jobs:
   #[POSTBUILD]
   postbuild:
     name: Post-Build
-    if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
+    if: ${{ !inputs.skip-unit-tests }}
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     steps:
