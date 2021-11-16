@@ -1,5 +1,5 @@
 {
-    "name": "Discord Link",
+    "name": "Discord Webhook",
     "description": "Sends update to Discord when git repo changes",
     "iconName": "dotnet",
     "categories": [
