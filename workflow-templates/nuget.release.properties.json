@@ -1,5 +1,5 @@
 {
-    "name": "NuGet Release",
+    "name": "Release",
     "description": "CI/CD for NuGet packages, auto bumps release versions. Pushes to GH and S3. Creates a release.",
     "iconName": "dotnet",
     "categories": [
