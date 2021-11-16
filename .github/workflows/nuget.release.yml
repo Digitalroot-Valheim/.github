@@ -125,7 +125,6 @@ jobs:
       informational-version: ${{ steps.vars.outputs.informational-version }}
       previous-tag: ${{ steps.vars.outputs.previous-tag }}
       next-tag: ${{ steps.vars.outputs.next-tag }}
-      change-log: ${{ steps.changelog.outputs.clean_changelog }}
 
     steps:
       - name: Checkout
@@ -149,14 +148,6 @@ jobs:
         id: semvers
         with:
           version: ${{ steps.previoustag.outputs.tag }}
-
-      - name: Create Change Log
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@4f6a9eceb8053a4a6ee3861fff240081692bb445
-        with:
-          output-file: 'false'
-          skip-version-file: 'true'
-          skip-commit: 'true'
 
       - name: Setup Variables
         id: vars
@@ -216,7 +207,6 @@ jobs:
           #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
           echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
           echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
-          echo "::notice title=clean_changelog::${{ steps.changelog.outputs.clean_changelog }}"
 
       - name: Dump steps context
         env:
