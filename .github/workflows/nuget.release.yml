@@ -313,7 +313,7 @@ jobs:
   #[POSTBUILD]
   postbuild:
     name: Post-Build
-    if: inputs.skip-unit-tests
+    if: ${{ !needs.prebuild.outputs.skip-unit-tests }}
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     steps:
