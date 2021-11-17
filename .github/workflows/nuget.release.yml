@@ -49,6 +49,12 @@ on:
         default: 'us-west-2'
         type: string
 
+      is-nuget-package:
+        description: 'Is the output a NuGet Package'
+        required: false
+        default: true
+        type: boolean
+
       nuget-gh-upload:
         description: 'Upload the nuget package to gh nuget repo.'
         required: false
@@ -125,6 +131,7 @@ jobs:
       informational-version: ${{ steps.vars.outputs.informational-version }}
       previous-tag: ${{ steps.vars.outputs.previous-tag }}
       next-tag: ${{ steps.vars.outputs.next-tag }}
+      is-nuget-package: ${{ steps.vars.outputs.is-nuget-package }}
 
     steps:
       - name: Checkout
@@ -165,6 +172,7 @@ jobs:
           echo "::set-output name=aws-region::${{ inputs.aws-region }}"
           echo "::set-output name=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+          echo "::set-output name=is-nuget-package::${{ inputs.is-nuget-package }}"
           echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
           echo "::set-output name=version::${{ steps.get-version.outputs.version }}"
@@ -187,11 +195,12 @@ jobs:
           echo "::notice title=force-assembly-version::${{ inputs.force-assembly-version }}"
           echo "::notice title=create-github-release::${{ inputs.create-github-release }}"
           echo "::notice title=aws-region::${{ inputs.aws-region }}"
-          echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
-          echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
 
       - name: Log Inputs cont
         run: | 
+          echo "::notice title=is-nuget-package::${{ inputs.is-nuget-package }}"
+          echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
+          echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
          
@@ -279,11 +288,18 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' && inputs.force-assembly-version }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} --version-suffix ${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
-      - name: Save Package
+      - name: Save nuget Package
         uses: actions/upload-artifact@v2
         with:
           path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/bin/Release/*.nupkg
           name: nuget-package
+          retention-days: 1
+
+      - name: Save Zip Package
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/bin/Release/*.zip
+          name: zip-package
           retention-days: 1
 
       - name: Download Sleet Config
@@ -399,9 +415,16 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
     steps:
       - name: Download nuget package
+        if: inputs.is-nuget-package
         uses: actions/download-artifact@v2
         with:
           name: nuget-package
+
+      - name: Download nuget package
+        if: ${{ !inputs.is-nuget-package }}
+        uses: actions/download-artifact@v2
+        with:
+          name: zip-package
 
       - name: Build Release Notes
         id: tag_version
@@ -420,7 +443,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: main
-          artifacts: ${{ github.workspace }}/*.nupkg
+          artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           
@@ -438,7 +461,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: main
-          artifacts: ${{ github.workspace }}/*.nupkg
+          artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
 
@@ -463,7 +486,7 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '3.1.0'
 
       - name: Restore tools
         run: dotnet tool install -g nexusuploader
@@ -476,5 +499,5 @@ jobs:
           UNEX_COOKIES: ${{ secrets.nexus-cookies-header }} # UNEX_COOKIES
  
         run: |
-          unex upload ${{ inputs.nexus-mod-id }} {{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
-          unex changelog "Test Change" ${{ needs.prebuild.outputs.artifactVersion }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
+          unex upload ${{ inputs.nexus-mod-id }} ${{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
+          unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
