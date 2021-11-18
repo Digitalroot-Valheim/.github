@@ -482,7 +482,7 @@ jobs:
         uses: actions/download-artifact@v2
         id: download
         with:
-          name: ${{ needs.prebuild.outputs.artifactName }}
+          name: zip-package
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
