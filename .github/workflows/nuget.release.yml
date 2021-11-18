@@ -500,4 +500,4 @@ jobs:
  
         run: |
           unex upload ${{ inputs.nexus-mod-id }} ${{ needs.prebuild.outputs.artifactName }} -v ${{ needs.prebuild.outputs.artifactVersion }}
-          unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
+          unex changelog "Test Change" ${{ needs.build.outputs.assembly-version }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
