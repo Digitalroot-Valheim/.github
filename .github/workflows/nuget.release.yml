@@ -546,12 +546,8 @@ jobs:
         run: dotnet tool install -g Digitalroot.OdinPlusModUploader
 
       - name: Upload
-        env:
-          NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
-          NEXUSMOD_COOKIE: ${{ secrets.nexus-cookies-header }}
- 
         run: |
-          opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "Main Mod File" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv 
+          opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "Main Mod File" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv -k ${{ secrets.nexus-api-key }} -c ${{ secrets.nexus-cookies-header }}
 
 #        unex upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }}
 #        unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
