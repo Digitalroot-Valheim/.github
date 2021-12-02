@@ -533,10 +533,13 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.2
         with:
-          dotnet-version: '3.1.x'
+          dotnet-version: '6.0.x'
           
       - name: Restore tools
-        run: dotnet tool install -g nexusuploader
+        run: dotnet tool install -g Digitalroot.OdinPlusModUploader
+
+      - name: Update tools
+        run: dotnet tool update -g Digitalroot.OdinPlusModUploader
 
       - name: Dump steps context
         env:
@@ -545,11 +548,11 @@ jobs:
 
       - name: Upload
         env:
-          UNEX_GAME: valheim
-          UNEX_DEBUG: true
-          UNEX_APIKEY: ${{ secrets.nexus-api-key }} # UNEX_API_KEY
-          UNEX_COOKIES: ${{ secrets.nexus-cookies-header }} # UNEX_COOKIES
+          NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
+          NEXUSMOD_COOKIE: ${{ secrets.nexus-cookies-header }}
  
         run: |
-          unex upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }}
-          unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
+          dotnet opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "Main Mod File" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv 
+
+#        unex upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }}
+#        unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
