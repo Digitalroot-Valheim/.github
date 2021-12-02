@@ -450,7 +450,7 @@ jobs:
           source-url: https://api.nuget.org/v3/index.json
 
       - name: Push to nuget.org repository
-        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate -k ${{ secrets.nuget-org-key }}
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg -s https://api.nuget.org/v3/index.json --skip-duplicate -k ${{ secrets.nuget-org-key }}
 
 
   #[PUBLISH]
