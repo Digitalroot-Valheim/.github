@@ -374,7 +374,7 @@ jobs:
   push-gh-nuget:
     name: Push nuget package to github repo
     needs: [prebuild, build]
-    if: inputs.nuget-gh-upload
+    if: inputs.is-nuget-package && inputs.nuget-gh-upload
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -402,7 +402,7 @@ jobs:
   push-s3-nuget:
     name: Push nuget package to S3 repo
     needs: [prebuild, build]
-    if: inputs.nuget-s3-upload
+    if: inputs.is-nuget-package && inputs.nuget-s3-upload
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -432,7 +432,7 @@ jobs:
   push-nuget-org:
     name: Push nuget package to nuget.org
     needs: [prebuild, build]
-    if: inputs.nuget-org-upload
+    if: inputs.is-nuget-package && inputs.nuget-org-upload
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -482,11 +482,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
 
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-
       - name: Dump Outputs
         env:
           OUTPUT_CONTEXT: ${{ toJSON(needs.build.outputs) }}
@@ -517,7 +512,7 @@ jobs:
           tag: v${{ needs.build.outputs.assembly-version }}
           name: Release ${{ needs.build.outputs.assembly-version }}
           body: ${{ steps.tag_version.outputs.changelog }}
-          allowUpdates: true
+          allowUpdates: false
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: main
           artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
@@ -534,7 +529,7 @@ jobs:
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload }}
+    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v2
