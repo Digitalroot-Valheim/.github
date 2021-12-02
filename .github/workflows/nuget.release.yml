@@ -225,7 +225,7 @@ jobs:
           #echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
           #echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
           #echo "::notice title=package-version::${{ steps.vars.outputs.package-version }}"
-          #echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
+          echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
           #echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
           #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
           echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
@@ -479,6 +479,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
+
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+
+      - name: Dump Outputs
+        env:
+          OUTPUT_CONTEXT: ${{ toJSON(needs.build.outputs) }}
+        run: echo "$OUTPUT_CONTEXT"
 
       - name: Create a GitHub release (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version }}
