@@ -243,6 +243,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: read
     timeout-minutes: 5
     steps:
       - name: Setup .NET Core SDK
