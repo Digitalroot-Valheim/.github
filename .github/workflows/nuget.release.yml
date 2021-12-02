@@ -66,6 +66,12 @@ on:
         required: false
         default: false
         type: boolean
+        
+      nuget-org-upload:
+        description: 'Upload the nuget package to nuget.org repo.'
+        required: false
+        default: false
+        type: boolean        
 
       nexus-enable-upload:
         description: 'Upload Mod to Nexus'
@@ -95,6 +101,10 @@ on:
       nexus-cookies-header:
         description: 'Nexus Cookie Header'
         required: false
+        
+      nuget-org-key:
+        description: 'nuget.org Api key'
+        required: false
 
 env:
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,6 +129,7 @@ jobs:
       aws-region: ${{ steps.vars.outputs.aws-region }}
       nuget-gh-upload: ${{ steps.vars.outputs.nuget-gh-upload }}
       nuget-s3-upload: ${{ steps.vars.outputs.nuget-s3-upload }}
+      nuget-org-upload: ${{ steps.vars.outputs.nuget-org-upload }}
       nexus-enable-upload: ${{ steps.vars.outputs.nexus-enable-upload }}
       nexus-mod-id: ${{ steps.vars.outputs.nexus-mod-id }}
       date: ${{ steps.vars.outputs.date }}
@@ -173,6 +184,7 @@ jobs:
           echo "::set-output name=aws-region::${{ inputs.aws-region }}"
           echo "::set-output name=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+          echo "::set-output name=nuget-org-upload::${{ inputs.nuget-org-upload }}"
           echo "::set-output name=is-nuget-package::${{ inputs.is-nuget-package }}"
           echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
@@ -202,6 +214,7 @@ jobs:
           echo "::notice title=is-nuget-package::${{ inputs.is-nuget-package }}"
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
+          echo "::notice title=nuget-org-upload::${{ inputs.nuget-org-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
          
@@ -411,6 +424,33 @@ jobs:
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
           sleet retention prune --config $GITHUB_WORKSPACE/sleet-config/sleet.json
+
+  #[PUSH NUGET.ORG]
+  push-nuget-org:
+    name: Push nuget package to nuget.org
+    needs: [prebuild, build]
+    if: inputs.nuget-org-upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.nuget-org-key }}
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - name: Download nuget package
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-package
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '6.0.x'
+          source-url: https://api.nuget.org/v3/index.json
+
+      - name: Push to nuget.org repository
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate
+
 
   #[PUBLISH]
   publish:
