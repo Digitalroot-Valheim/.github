@@ -454,7 +454,6 @@ jobs:
       - name: Push to nuget.org repository
         run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg -s https://api.nuget.org/v3/index.json --skip-duplicate -k ${{ secrets.nuget-org-key }}
 
-
   #[PUBLISH]
   publish:
     name: Create github release
@@ -530,7 +529,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
+
     steps:
+
+      - name: Fail on missing nexus-api-key
+        if: secrets.nexus-api-key == ''
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            core.setFailed('nexus-api-key is empty')
+
+      - name: Fail on missing nexus-cookies-header
+        if: secrets.nexus-cookies-header == ''
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            core.setFailed('nexus-cookies-header is empty')
+
       - name: Download artifact
         uses: actions/download-artifact@v2
         id: download
@@ -546,8 +561,13 @@ jobs:
         run: dotnet tool install -g Digitalroot.OdinPlusModUploader
 
       - name: Upload
+        if: ${{ secrets.nexus-api-key != '' && secrets.nexus-cookies-header != '' }}
+        env:
+          NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
+          NEXUSMOD_COOKIE: ${{ secrets.nexus-cookies-header }}
         run: |
-          opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv -k ${{ secrets.nexus-api-key }} -c ${{ secrets.nexus-cookies-header }}
+          opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
+
 
 #        unex upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }}
 #        unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
