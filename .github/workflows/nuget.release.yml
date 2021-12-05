@@ -528,20 +528,6 @@ jobs:
 
     steps:
 
-      - name: Fail on missing nexus-api-key
-        if: ${{ secrets.nexus-api-key == '' }}
-        uses: actions/github-script@v5.0.0
-        with:
-          script: |
-            core.setFailed('nexus-api-key is empty')
-
-      - name: Fail on missing nexus-cookies-header
-        if: ${{ secrets.nexus-cookies-header == '' }}
-        uses: actions/github-script@v5.0.0
-        with:
-          script: |
-            core.setFailed('nexus-cookies-header is empty')
-
       - name: Download artifact
         uses: actions/download-artifact@v2
         id: download
