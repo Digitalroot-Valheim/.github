@@ -297,7 +297,7 @@ jobs:
 
       - name: Pack PreRelease (w/ Version Bump)
         if: ${{ github.ref == 'refs/heads/develop' && !inputs.force-assembly-version }}
-        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }}-${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
+        run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }}-prerelease-${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Save nuget Package
         if: inputs.is-nuget-package
