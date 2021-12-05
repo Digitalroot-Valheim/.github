@@ -543,7 +543,6 @@ jobs:
         run: dotnet tool install -g Digitalroot.OdinPlusModUploader
 
       - name: Upload
-        if: ${{ secrets.nexus-api-key != '' && secrets.nexus-cookies-header != '' }}
         env:
           NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
           NEXUSMOD_COOKIE: ${{ secrets.nexus-cookies-header }}
