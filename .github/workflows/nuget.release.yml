@@ -374,7 +374,7 @@ jobs:
   push-gh-nuget:
     name: Push nuget package to github repo
     needs: [prebuild, build]
-    if: inputs.is-nuget-package && inputs.nuget-gh-upload
+    if: ${{ inputs.is-nuget-package && inputs.nuget-gh-upload }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -402,7 +402,7 @@ jobs:
   push-s3-nuget:
     name: Push nuget package to S3 repo
     needs: [prebuild, build]
-    if: inputs.is-nuget-package && inputs.nuget-s3-upload
+    if: ${{ inputs.is-nuget-package && inputs.nuget-s3-upload }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -432,7 +432,7 @@ jobs:
   push-nuget-org:
     name: Push nuget package to nuget.org
     needs: [prebuild, build]
-    if: inputs.is-nuget-package && inputs.nuget-org-upload
+    if: ${{ inputs.is-nuget-package && inputs.nuget-org-upload }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
