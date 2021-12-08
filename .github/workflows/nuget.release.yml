@@ -7,24 +7,24 @@ on:
         description: 'Name of SLN file w/o .sln, assumes sln file is in the src-path dir. e.g. ./src-path/sln-file-name.sln'
         required: true
         type: string
-        
+
       proj-file-name:
         description: 'Name of proj file w/o .csproj, assumes proj dir is named the same as the proj-file-name. e.g. ./src-path/proj-file-name/proj-file-name.csproj'
         required: true
         type: string
-      
+
       src-path:
         description: 'Path to source w/o trailing /'
         required: false
         default: 'src'
         type: string
-        
+
       unit-test-path:
         description: 'Path to UnitTest project dir w/o trailing /, assumes path starts after src-path. e.g. ./src-path/unit-test-path'
         required: false
         default: 'UnitTests'
         type: string
-        
+
       skip-unit-tests:
         description: 'Skip Unit Tests'
         required: false
@@ -66,19 +66,19 @@ on:
         required: false
         default: false
         type: boolean
-        
+
       nuget-org-upload:
         description: 'Upload the nuget package to nuget.org repo.'
         required: false
         default: false
-        type: boolean        
+        type: boolean
 
       nexus-enable-upload:
         description: 'Upload Mod to Nexus'
         required: false
         default: false
         type: boolean
-        
+
       nexus-mod-id:
         description: 'Nexus Id for the mod.'
         required: false
@@ -89,19 +89,19 @@ on:
       aws-access-key-id:
         description: 'AWS Access Key Id'
         required: false
-        
+
       aws-secret-access-key:
-        description: 'AWS Secret Access Key'      
+        description: 'AWS Secret Access Key'
         required: false
-        
+
       nexus-api-key:
         description: 'Nexus Api key'
         required: false
-        
+
       nexus-cookies-header:
         description: 'Nexus Cookie Header'
         required: false
-        
+
       nuget-org-key:
         description: 'nuget.org Api key'
         required: false
@@ -160,7 +160,7 @@ jobs:
         id: previoustag
         with:
           semver_only: true
-          initial_version: ${{steps.get-version.outputs.assembly-version}}          
+          initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Get next minor version
         uses: WyriHaximus/github-action-next-semvers@33d116a4c239252582a60a1ba8dbba63ad493ffd
@@ -199,7 +199,7 @@ jobs:
           echo "::set-output name=next-tag::${{ steps.semvers.outputs.patch }}"
 
       - name: Log Inputs
-        run: | 
+        run: |
           echo "::notice title=sln-file-name::${{ inputs.sln-file-name }}"
           echo "::notice title=proj-file-name::${{ inputs.proj-file-name }}"
           echo "::notice title=src-path::${{ inputs.src-path }}"
@@ -210,16 +210,16 @@ jobs:
           echo "::notice title=aws-region::${{ inputs.aws-region }}"
 
       - name: Log Inputs cont
-        run: | 
+        run: |
           echo "::notice title=is-nuget-package::${{ inputs.is-nuget-package }}"
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nuget-org-upload::${{ inputs.nuget-org-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-         
+
       - name: Log Variables
-        run: | 
+        run: |
           echo "::notice title=date::${{ steps.vars.outputs.date }}"
           #echo "::notice title=version::${{ steps.vars.outputs.version }}"
           #echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
@@ -324,7 +324,7 @@ jobs:
           path: ${{ github.workspace }}/sleet.json
           name: sleet-config
           retention-days: 1
-          
+
       - name: Cache packages to S3 nuget repository
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
@@ -333,7 +333,7 @@ jobs:
         run: |
           dotnet tool install -g sleet
           sleet push $NUGET_PACKAGES --skip-existing --config $GITHUB_WORKSPACE/sleet.json
-         
+
   #[POSTBUILD]
   postbuild:
     name: Post-Build
@@ -410,7 +410,7 @@ jobs:
         uses: actions/setup-dotnet@v1.8.2
         with:
           dotnet-version: '6.0.x'
-          
+
       - name: Download nuget package
         uses: actions/download-artifact@v2
 
@@ -450,69 +450,6 @@ jobs:
       - name: Push to nuget.org repository
         run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg -s https://api.nuget.org/v3/index.json --skip-duplicate -k ${{ secrets.nuget-org-key }}
 
-  #[PUBLISH]
-  publish:
-    name: Create github release
-    needs: [prebuild, build]
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
-    steps:
-      - name: Download nuget package
-        if: inputs.is-nuget-package
-        uses: actions/download-artifact@v2
-        with:
-          name: nuget-package
-
-      - name: Download nuget package
-        if: ${{ !inputs.is-nuget-package }}
-        uses: actions/download-artifact@v2
-        with:
-          name: zip-package
-
-      - name: Build Release Notes
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v5.6
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: false
-
-      - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version }}
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.prebuild.outputs.next-tag }}
-          name: Release ${{ needs.prebuild.outputs.next-tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit: main
-          artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-          
-      - name: Print Release Info
-        if: ${{ !inputs.force-assembly-version }}
-        run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"          
-          
-      - name: Create a GitHub release (w/o Version Bump)
-        if: inputs.force-assembly-version
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.build.outputs.assembly-version }}
-          name: Release ${{ needs.build.outputs.assembly-version }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-          allowUpdates: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit: main
-          artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-
-      - name: Print Release Info
-        if: inputs.force-assembly-version
-        run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
-
   # Nexus Upload
   nexusupload:
     name: Upload to Nexus
@@ -532,7 +469,7 @@ jobs:
         uses: actions/setup-dotnet@v1.8.2
         with:
           dotnet-version: '6.0.x'
-          
+
       - name: Restore tools
         run: dotnet tool install -g Digitalroot.OdinPlusModUploader
 
@@ -543,6 +480,73 @@ jobs:
         run: |
           opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
 
+  #[PUBLISH]
+  publish:
+    name: Create github release
+    needs: [prebuild, build, postbuild, nexusupload, push-nuget-org, push-s3-nuget, push-gh-nuget]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: ${{ always() }}
 
-#        unex upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }}
-#        unex changelog "Test Change" ${{ needs.prebuild.outputs.next-tag }} -m ${{ inputs.nexus-mod-id }} -g "valheim"
+    steps:
+      - name: Download nuget package
+        if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
+        run: |
+          echo "::notice title=success::${{ success() }}"
+          echo "::notice title=cancelled::${{ cancelled() }}"
+          echo "::notice title=failure::${{ failure() }}"
+
+      - name: Download nuget package
+        if: inputs.is-nuget-package
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-package
+
+      - name: Download zip package
+        if: ${{ !inputs.is-nuget-package }}
+        uses: actions/download-artifact@v2
+        with:
+          name: zip-package
+
+      - name: Build Release Notes
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: false
+
+      #- name: Create a GitHub release (w/ Version Bump)
+      #  if: ${{ !inputs.force-assembly-version }}
+      #  uses: ncipollo/release-action@v1
+      #  with:
+      #    tag: v${{ needs.prebuild.outputs.next-tag }}
+      #    name: Release ${{ needs.prebuild.outputs.next-tag }}
+      #    body: ${{ steps.tag_version.outputs.changelog }}
+      #    allowUpdates: true
+      #    token: ${{ secrets.GITHUB_TOKEN }}
+      #    commit: main
+      #    artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
+      #    omitBodyDuringUpdate: true
+      #    omitNameDuringUpdate: true
+
+      - name: Print Release Info
+        if: ${{ !inputs.force-assembly-version }}
+        run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"
+
+      #- name: Create a GitHub release (w/o Version Bump)
+      #  if: inputs.force-assembly-version
+      #  uses: ncipollo/release-action@v1
+      #  with:
+      #    tag: v${{ needs.build.outputs.assembly-version }}
+      #    name: Release ${{ needs.build.outputs.assembly-version }}
+      #    body: ${{ steps.tag_version.outputs.changelog }}
+      #    allowUpdates: false
+      #    token: ${{ secrets.GITHUB_TOKEN }}
+      #    commit: main
+      #    artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
+      #    omitBodyDuringUpdate: true
+      #    omitNameDuringUpdate: true
+
+      - name: Print Release Info
+        if: inputs.force-assembly-version
+        run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
