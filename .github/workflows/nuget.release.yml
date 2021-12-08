@@ -489,12 +489,16 @@ jobs:
     if: ${{ always() }}
 
     steps:
-      - name: Download nuget package
-        if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
+      #- name: Dump needs
+      #  if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
+      - name: Dump needs context
+        env:
+            NEEDS_CONTEXT: ${{ toJSON(needs) }}
+        run: echo "$NEEDS_CONTEXT"
+
+      - name: STOP
         run: |
-          echo "::notice title=success::${{ success() }}"
-          echo "::notice title=cancelled::${{ cancelled() }}"
-          echo "::notice title=failure::${{ failure() }}"
+          exit 1
 
       - name: Download nuget package
         if: inputs.is-nuget-package
