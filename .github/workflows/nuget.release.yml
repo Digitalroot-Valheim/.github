@@ -477,11 +477,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
 
-      - name: Dump Outputs
-        env:
-          OUTPUT_CONTEXT: ${{ toJSON(needs.build.outputs) }}
-        run: echo "$OUTPUT_CONTEXT"
-
       - name: Create a GitHub release (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version }}
         uses: ncipollo/release-action@v1
@@ -527,7 +522,6 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
 
     steps:
-
       - name: Download artifact
         uses: actions/download-artifact@v2
         id: download
