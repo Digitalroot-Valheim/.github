@@ -288,15 +288,15 @@ jobs:
           retention-days: 1
 
       - name: Pack Release (w/ Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version }}
+        if: ${{ github.ref == 'refs/heads/main' && !inputs.force-assembly-version && inputs.is-nuget-package }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
 
       - name: Pack Release (w/o Version Bump)
-        if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version }}
+        if: ${{ github.ref == 'refs/heads/main' && inputs.force-assembly-version && inputs.is-nuget-package }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo -v n
 
       - name: Pack PreRelease (w/ Version Bump)
-        if: ${{ github.ref == 'refs/heads/develop' && !inputs.force-assembly-version }}
+        if: ${{ github.ref == 'refs/heads/develop' && !inputs.force-assembly-version && inputs.is-nuget-package }}
         run: dotnet pack $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj -c Release --no-restore --no-build --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }}-prerelease-${{ needs.prebuild.outputs.date }}-$GITHUB_RUN_NUMBER -v n
 
       - name: Save nuget Package
