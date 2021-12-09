@@ -267,9 +267,19 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
 
+      - name: Install replace-in-file tool
+        if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
+        run: dotnet tool install -g replace-in-file
+
       - name: Build (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version }}
-        run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
+        if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
+        run: |
+          replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/MetaData.cs" -set "%%VERSION%%" "${{ needs.prebuild.outputs.next-tag }}"
+          dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
+
+      - name: Build nuget (w/ Version Bump)
+        if: ${{ !inputs.force-assembly-version && inputs.is-nuget-package }}
+        run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Build (w/o Version Bump)
         if: ${{ inputs.force-assembly-version }}
