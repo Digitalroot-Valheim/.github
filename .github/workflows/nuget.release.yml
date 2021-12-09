@@ -499,7 +499,7 @@ jobs:
         run: echo "$NEEDS_CONTEXT"
 
       - name: Check for failure.
-        if: ${{ needs.prebuild.result == 'failure' || needs.build.result == 'failure' || needs.postbuild.result == 'failure' || needs.nexusupload.result == 'failure' || needs."push-nuget-org.result == 'failure' || needs.push-s3-nuget.result == 'failure' || needs.push-gh-nuget.result == 'failure' }}
+        if: ${{ needs.prebuild.result == 'failure' || needs.build.result == 'failure' || needs.postbuild.result == 'failure' || needs.nexusupload.result == 'failure' || needs.push-nuget-org.result == 'failure' || needs.push-s3-nuget.result == 'failure' || needs.push-gh-nuget.result == 'failure' }}
         run: exit 1
 
       - name: Download nuget package
