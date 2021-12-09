@@ -275,7 +275,7 @@ jobs:
         if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
         run: |
           replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/MetaData.cs" -set "%%VERSION%%" "${{ needs.prebuild.outputs.next-tag }}"
-          dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo /p:Version=${{ needs.prebuild.outputs.next-tag }} -v n
+          dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Build nuget (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version && inputs.is-nuget-package }}
