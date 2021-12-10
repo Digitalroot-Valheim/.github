@@ -276,7 +276,7 @@ jobs:
       - name: Build (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
         run: |
-          replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/MetaData.cs" -set "%%VERSION%%" "${{ needs.prebuild.outputs.next-tag }}"
+          replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/MetaData.cs" -set "0.0.1" "${{ needs.prebuild.outputs.next-tag }}"
           dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Build nuget (w/ Version Bump)
@@ -490,6 +490,7 @@ jobs:
           NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
           NEXUSMOD_COOKIE: ${{ secrets.nexus-cookies-header }}
         run: |
+          opmu nx check
           opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
 
   #[PUBLISH]
@@ -501,10 +502,6 @@ jobs:
     if: ${{ always() }}
 
     steps:
-      - name: Release branch check
-        if: ${{ github.ref != 'refs/heads/main' || inputs.create-github-release }}
-        run: exit 0
-
       - name: Dump needs context
         env:
             NEEDS_CONTEXT: ${{ toJSON(needs) }}
@@ -515,18 +512,19 @@ jobs:
         run: exit 1
 
       - name: Download nuget package
-        if: inputs.is-nuget-package
+        if: ${{ inputs.is-nuget-package && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         uses: actions/download-artifact@v2
         with:
           name: nuget-package
 
       - name: Download zip package
-        if: ${{ !inputs.is-nuget-package }}
+        if: ${{ !inputs.is-nuget-package && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         uses: actions/download-artifact@v2
         with:
           name: zip-package
 
       - name: Build Release Notes
+        if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
         id: tag_version
         uses: mathieudutour/github-tag-action@v5.6
         with:
@@ -534,7 +532,7 @@ jobs:
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version }}
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
@@ -548,11 +546,11 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Print Release Info
-        if: ${{ !inputs.force-assembly-version }}
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"
 
       - name: Create a GitHub release (w/o Version Bump)
-        if: inputs.force-assembly-version
+        if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
@@ -564,7 +562,3 @@ jobs:
           artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
-
-      - name: Print Release Info
-        if: inputs.force-assembly-version
-        run: echo "::notice title=Release::${{ needs.build.outputs.assembly-version }}"
