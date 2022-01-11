@@ -496,7 +496,7 @@ jobs:
   #[PUBLISH]
   publish:
     name: Create github release
-    needs: [prebuild, build, postbuild, nexusupload, push-nuget-org, push-s3-nuget, push-gh-nuget]
+    needs: [prebuild, build, postbuild]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: ${{ always() }}
@@ -508,7 +508,7 @@ jobs:
         run: echo "$NEEDS_CONTEXT"
 
       - name: Check for failure.
-        if: ${{ needs.prebuild.result == 'failure' || needs.build.result == 'failure' || needs.postbuild.result == 'failure' || needs.nexusupload.result == 'failure' || needs.push-nuget-org.result == 'failure' || needs.push-s3-nuget.result == 'failure' || needs.push-gh-nuget.result == 'failure' }}
+        if: ${{ needs.prebuild.result == 'failure' || needs.build.result == 'failure' || needs.postbuild.result == 'failure' }}
         run: exit 1
 
       - name: Download nuget package
