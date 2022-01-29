@@ -117,7 +117,7 @@ jobs:
   prebuild:
     name: Pre-Build
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     outputs:
       sln-file-name: ${{ steps.vars.outputs.sln-file-name }}
       proj-file-name: ${{ steps.vars.outputs.proj-file-name }}
@@ -244,7 +244,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.9.0
@@ -352,7 +352,7 @@ jobs:
     if: ${{ !inputs.skip-unit-tests }}
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -384,7 +384,7 @@ jobs:
     needs: [prebuild, build]
     if: ${{ inputs.is-nuget-package && inputs.nuget-gh-upload }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       packages: write
     env:
@@ -412,7 +412,7 @@ jobs:
     needs: [prebuild, build]
     if: ${{ inputs.is-nuget-package && inputs.nuget-s3-upload }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -442,7 +442,7 @@ jobs:
     needs: [prebuild, build]
     if: ${{ inputs.is-nuget-package && inputs.nuget-org-upload }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     env:
       NUGET_AUTH_TOKEN: ${{ secrets.nuget-org-key }}
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -467,7 +467,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
 
     steps:
@@ -498,8 +498,8 @@ jobs:
     name: Create github release
     needs: [prebuild, build, postbuild]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: ${{ always() }}
+    timeout-minutes: 10
+    if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
 
     steps:
       - name: Dump needs context
