@@ -328,9 +328,11 @@ jobs:
           retention-days: 1
 
       - name: Download Sleet Config
+        if: ${{ inputs.nuget-s3-upload }}
         run: wget https://raw.githubusercontent.com/Digitalroot-Valheim/.github/main/.config/sleet.json
 
       - name: Save Sleet Config
+        if: ${{ inputs.nuget-s3-upload }}
         uses: actions/upload-artifact@v2
         with:
           path: ${{ github.workspace }}/sleet.json
@@ -338,6 +340,7 @@ jobs:
           retention-days: 1
 
       - name: Cache packages to S3 nuget repository
+        if: ${{ inputs.nuget-s3-upload }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
