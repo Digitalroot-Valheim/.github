@@ -150,7 +150,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get Assembly Version
-        uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
+        uses: kzrnm/get-net-sdk-project-versions-action@v1.1.2
         id: get-version
         with:
           proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
@@ -163,7 +163,7 @@ jobs:
           initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Get next minor version
-        uses: WyriHaximus/github-action-next-semvers@33d116a4c239252582a60a1ba8dbba63ad493ffd
+        uses: WyriHaximus/github-action-next-semvers@v1.1.0
         id: semvers
         with:
           version: ${{ steps.previoustag.outputs.tag }}
@@ -369,7 +369,7 @@ jobs:
           ls -la ${{ github.workspace }}
 
       - name: Test Reporter
-        uses: dorny/test-reporter@v1.5.0
+        uses: dorny/test-reporter@v1.6.0
         with:
           name: NUnit Tests                              # Name of the check run which will be created
           path: ${{ github.workspace }}/test-results.trx # Path to test results
@@ -528,14 +528,14 @@ jobs:
       - name: Build Release Notes
         if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
         id: tag_version
-        uses: mathieudutour/github-tag-action@v5.6
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
 
       - name: Create a GitHub release (w/ Version Bump)
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.11.2
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
           name: Release ${{ needs.prebuild.outputs.next-tag }}
@@ -553,7 +553,7 @@ jobs:
 
       - name: Create a GitHub release (w/o Version Bump)
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.11.2
         with:
           tag: v${{ needs.build.outputs.assembly-version }}
           name: Release ${{ needs.build.outputs.assembly-version }}
