@@ -245,17 +245,8 @@ jobs:
       contents: read
       packages: read
     timeout-minutes: 10
+
     steps:
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-
-      - name: Dump needs context
-        env:
-          NEEDS_CONTEXT: ${{ toJSON(needs) }}
-        run: echo "$NEEDS_CONTEXT"
-
       - name: Setup .NET 6 SDK
         uses: actions/setup-dotnet@v3
         with:
