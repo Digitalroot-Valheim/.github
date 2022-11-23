@@ -246,7 +246,7 @@ jobs:
       packages: read
     timeout-minutes: 10
     steps:
-      - name: Setup .NET Core SDK
+      - name: Setup .NET 6 SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
@@ -291,7 +291,7 @@ jobs:
         run: dotnet test $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --no-build -l "trx;LogFileName=test-results.trx" --nologo -v n
 
       - name: Save Test Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ !inputs.skip-unit-tests }}
         with:
           path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/UnitTests/TestResults/test-results.trx
@@ -312,7 +312,7 @@ jobs:
 
       - name: Save nuget Package
         if: inputs.is-nuget-package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/bin/Release/*.nupkg
           name: nuget-package
@@ -320,7 +320,7 @@ jobs:
 
       - name: Save Zip Package
         if: ${{ !inputs.is-nuget-package }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/bin/Release/*.zip
           name: zip-package
@@ -332,7 +332,7 @@ jobs:
 
       - name: Save Sleet Config
         if: ${{ inputs.nuget-s3-upload }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ github.workspace }}/sleet.json
           name: sleet-config
@@ -360,7 +360,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download nuget package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: test-results
 
@@ -395,12 +395,12 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
       - name: Download nuget package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: nuget-package
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
           source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
@@ -420,13 +420,13 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
 
       - name: Download nuget package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
 
       - name: Push to S3 nuget repository
         env:
@@ -451,12 +451,12 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
       - name: Download nuget package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: nuget-package
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
           source-url: https://api.nuget.org/v3/index.json
@@ -474,13 +474,13 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         id: download
         with:
           name: zip-package
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.8.2
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
 
@@ -515,13 +515,13 @@ jobs:
 
       - name: Download nuget package
         if: ${{ inputs.is-nuget-package && github.ref == 'refs/heads/main' && inputs.create-github-release }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: nuget-package
 
       - name: Download zip package
         if: ${{ !inputs.is-nuget-package && github.ref == 'refs/heads/main' && inputs.create-github-release }}
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: zip-package
 
