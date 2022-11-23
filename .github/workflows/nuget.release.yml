@@ -147,7 +147,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get Assembly Version
         uses: kzrnm/get-net-sdk-project-versions-action@b7bb297b2d300fb378be2cd93a262a15bcf9d79b
