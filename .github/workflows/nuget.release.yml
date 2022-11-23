@@ -173,30 +173,30 @@ jobs:
         env:
           LC_ALL: en_US.utf8
         run: |
-          echo "::set-output name=date::$(date +'%Y%m%d')"
-          echo "::set-output name=sln-file-name::${{ inputs.sln-file-name }}"
-          echo "::set-output name=proj-file-name::${{ inputs.proj-file-name }}"
-          echo "::set-output name=src-path::${{ inputs.src-path }}"
-          echo "::set-output name=unit-test-path::${{ inputs.unit-test-path }}"
-          echo "::set-output name=skip-unit-tests::${{ inputs.skip-unit-tests }}"
-          echo "::set-output name=force-assembly-version::${{ inputs.force-assembly-version }}"
-          echo "::set-output name=create-github-release::${{ inputs.create-github-release }}"
-          echo "::set-output name=aws-region::${{ inputs.aws-region }}"
-          echo "::set-output name=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
-          echo "::set-output name=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
-          echo "::set-output name=nuget-org-upload::${{ inputs.nuget-org-upload }}"
-          echo "::set-output name=is-nuget-package::${{ inputs.is-nuget-package }}"
-          echo "::set-output name=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
-          echo "::set-output name=nexus-mod-id::${{ inputs.nexus-mod-id }}"
-          echo "::set-output name=version::${{ steps.get-version.outputs.version }}"
-          echo "::set-output name=version-prefix::${{ steps.get-version.outputs.version-prefix }}"
-          echo "::set-output name=version-suffix::${{ steps.get-version.outputs.version-suffix }}"
-          echo "::set-output name=package-version::${{ steps.get-version.outputs.package-version }}"
-          echo "::set-output name=assembly-version::${{ steps.get-version.outputs.assembly-version }}"
-          echo "::set-output name=file-version::${{ steps.get-version.outputs.file-version }}"
-          echo "::set-output name=informational-version::${{ steps.get-version.outputs.informational-version }}"
-          echo "::set-output name=previous-tag::${{ steps.previoustag.outputs.tag }}"
-          echo "::set-output name=next-tag::${{ steps.semvers.outputs.patch }}"
+          echo "{date}={$(date +'%Y%m%d')}" >> $GITHUB_OUTPUT
+          echo "{sln-file-name}={${{ inputs.sln-file-name }}}" >> $GITHUB_OUTPUT
+          echo "{proj-file-name}={${{ inputs.proj-file-name }}}" >> $GITHUB_OUTPUT
+          echo "{src-path}={${{ inputs.src-path }}}" >> $GITHUB_OUTPUT
+          echo "{unit-test-path}={${{ inputs.unit-test-path }}}" >> $GITHUB_OUTPUT
+          echo "{skip-unit-tests}={${{ inputs.skip-unit-tests }}}" >> $GITHUB_OUTPUT
+          echo "{force-assembly-version}={${{ inputs.force-assembly-version }}}" >> $GITHUB_OUTPUT
+          echo "{create-github-release}={${{ inputs.create-github-release }}}" >> $GITHUB_OUTPUT
+          echo "{aws-region}={${{ inputs.aws-region }}}" >> $GITHUB_OUTPUT
+          echo "{nuget-gh-upload}={${{ inputs.nuget-gh-upload }}}" >> $GITHUB_OUTPUT
+          echo "{nuget-s3-upload}={${{ inputs.nuget-s3-upload }}}" >> $GITHUB_OUTPUT
+          echo "{nuget-org-upload}={${{ inputs.nuget-org-upload }}}" >> $GITHUB_OUTPUT
+          echo "{is-nuget-package}={${{ inputs.is-nuget-package }}}" >> $GITHUB_OUTPUT
+          echo "{nexus-enable-upload}={${{ inputs.nexus-enable-upload }}}" >> $GITHUB_OUTPUT
+          echo "{nexus-mod-id}={${{ inputs.nexus-mod-id }}}" >> $GITHUB_OUTPUT
+          echo "{version}={${{ steps.get-version.outputs.version }}}" >> $GITHUB_OUTPUT
+          echo "{version-prefix}={${{ steps.get-version.outputs.version-prefix }}}" >> $GITHUB_OUTPUT
+          echo "{version-suffix}={${{ steps.get-version.outputs.version-suffix }}}" >> $GITHUB_OUTPUT
+          echo "{package-version}={${{ steps.get-version.outputs.package-version }}}" >> $GITHUB_OUTPUT
+          echo "{assembly-version}={${{ steps.get-version.outputs.assembly-version }}}" >> $GITHUB_OUTPUT
+          echo "{file-version}={${{ steps.get-version.outputs.file-version }}}" >> $GITHUB_OUTPUT
+          echo "{informational-version}={${{ steps.get-version.outputs.informational-version }}}" >> $GITHUB_OUTPUT
+          echo "{previous-tag}={${{ steps.previoustag.outputs.tag }}}" >> $GITHUB_OUTPUT
+          echo "{next-tag}={${{ steps.semvers.outputs.patch }}}" >> $GITHUB_OUTPUT
 
       - name: Log Inputs
         run: |
