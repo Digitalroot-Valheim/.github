@@ -404,10 +404,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
-          source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
+          #source-url: https://nuget.pkg.github.com/Digitalroot-Valheim/index.json
 
       - name: Push to GH nuget repository
-        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate
+        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate \
+             --api-key ${{ secrets.GITHUB_TOKEN }} \ 
+             --source https://nuget.pkg.github.com/${{ github.repository_owner }}
 
   #[PUSH S3]
   push-s3-nuget:
