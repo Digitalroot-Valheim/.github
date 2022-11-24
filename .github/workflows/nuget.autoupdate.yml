@@ -19,6 +19,11 @@ on:
         default: 'src'
         type: string
 
+    secrets:
+      github-pat:
+        description: 'Github PAT'
+        required: true
+
 env:
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -82,7 +87,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.AUTOMATED_DEPENDENCY_UPDATES_TOKEN }}
+          token: ${{ secrets.github-pat }}
           ref: ${{ github.head_ref }}
 
       - name: Setup Package Cache
@@ -97,7 +102,6 @@ jobs:
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
         run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
-
 
       - name: Tools
         id: tools
