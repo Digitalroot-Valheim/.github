@@ -4,9 +4,9 @@ concurrency: ci-${{ github.ref }}
 
 on:
   workflow_dispatch:
-    branches: [ main ] # Default release branch
+    branches: [ $default-branch ] # Default release branch
   push:
-    branches: [ main ] # Default release branch
+    branches: [ $default-branch ] # Default release branch
     paths:
       - 'src/**'   
       - '.github/workflows/**' 
