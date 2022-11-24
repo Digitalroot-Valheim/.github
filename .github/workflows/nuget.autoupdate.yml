@@ -1,0 +1,132 @@
+name: Automated NuGet Dependency Updates
+
+on:
+  workflow_call:
+    inputs:
+      sln-file-name:
+        description: 'Name of SLN file w/o .sln, assumes sln file is in the src-path dir. e.g. ./src-path/sln-file-name.sln'
+        required: true
+        type: string
+
+      proj-file-name:
+        description: 'Name of proj file w/o .csproj, assumes proj dir is named the same as the proj-file-name. e.g. ./src-path/proj-file-name/proj-file-name.csproj'
+        required: true
+        type: string
+
+      src-path:
+        description: 'Path to source w/o trailing /'
+        required: false
+        default: 'src'
+        type: string
+
+env:
+  NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  #[PREBUILD]
+  prebuild:
+    name: Pre-Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      sln-file-name: ${{ steps.vars.outputs.sln-file-name }}
+      proj-file-name: ${{ steps.vars.outputs.proj-file-name }}
+      src-path: ${{ steps.vars.outputs.src-path }}
+
+    steps:
+      - name: Setup Variables
+        id: vars
+        env:
+          LC_ALL: en_US.utf8
+        run: |
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "sln-file-name=${{ inputs.sln-file-name }}" >> $GITHUB_OUTPUT
+          echo "proj-file-name=${{ inputs.proj-file-name }}" >> $GITHUB_OUTPUT
+          echo "src-path=${{ inputs.src-path }}" >> $GITHUB_OUTPUT
+
+      - name: Log Inputs
+        run: |
+          echo "::notice title=sln-file-name::${{ inputs.sln-file-name }}"
+          echo "::notice title=proj-file-name::${{ inputs.proj-file-name }}"
+          echo "::notice title=src-path::${{ inputs.src-path }}"
+
+      - name: Log Variables
+        run: |
+          echo "::notice title=date::${{ steps.vars.outputs.date }}"
+
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+
+  dependencies: 
+    name: Update Dependencies
+    needs: [prebuild]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            6.0.x
+
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.AUTOMATED_DEPENDENCY_UPDATES_TOKEN }}
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Package Cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
+
+
+      - name: Tools
+        id: tools
+        run: dotnet tool install --global dotnet-outdated-tool
+
+      - name: Update
+        id: update
+        run: |
+          OUTPUT=$(dotnet outdated -vl Major --include Digitalroot --include digitalroot)
+          if [[ $OUTPUT =~ "No outdated dependencies were detected" ]]; then
+            echo "::set-output name=updated::false"
+          else
+            dotnet outdated -u
+            echo "::set-output name=updated::true"
+          fi
+        shell: bash
+
+      - name: Test
+        id: test
+        if: ${{ steps.update.outputs.updated == 'true' }}
+        run: dotnet test -c Release -v minimal
+
+      - name: Push
+        id: push
+        if: ${{ steps.update.outputs.updated == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v4.15.4
+        with:
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_message: Automated NuGet Dependency Updates
+          file_pattern: 'packages.lock.json *.csproj'

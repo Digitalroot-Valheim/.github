@@ -263,7 +263,7 @@ jobs:
           path: ${{ github.workspace }}/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-nuget-${{ github.repository_owner }}
+            ${{ runner.os }}-nuget-
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
