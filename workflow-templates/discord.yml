@@ -3,10 +3,13 @@ name: Discord Webhook
 concurrency: ci-${{ github.ref }}
 
 on:
+  workflow_dispatch:
+    branches: [ main ] # Default release branch
   push:
-    branches: [ $default-branch ] # Default release branch
+    branches: [ main ] # Default release branch
     paths:
       - 'src/**'   
+      - '.github/workflows/**' 
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -14,8 +17,10 @@ env:
 
 jobs:
   call-workflow-discord-hook:
-    uses: Digitalroot-Valheim/.github/.github/workflows/discord.yml@main
-    secrets:
-      webhook_url: ${{ secrets.VALHEIM_DISCORD_TITANS_WEBHOOK_URL }}
-    with:
-      repo_name: Placeholder
+    runs-on: ubuntu-latest
+    steps:
+    - uses: Digitalroot-Valheim/.github/.github/workflows/discord.yml@main
+      secrets:
+        webhook_url: ${{ secrets.VALHEIM_DISCORD_TITANS_WEBHOOK_URL }}
+      with:
+        repo_name: ${{ github.repository }}
