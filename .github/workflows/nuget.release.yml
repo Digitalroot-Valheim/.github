@@ -230,6 +230,15 @@ jobs:
           #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
           echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
           echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
+          echo "::notice title=previous-tag-t::${{ inputs.sln-file-name }}"
+
+      - name: Workflow Testing
+        id: workflow-testing
+        run: |
+          OUTPUT=$(git describe --tags --abbrev=0)
+          echo "::set-output name=updated::true"
+          echo "::notice title=previous-tag-t::$OUTPUT"
+        shell: bash
 
       - name: Dump steps context
         env:
