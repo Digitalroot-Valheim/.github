@@ -124,7 +124,7 @@ jobs:
       - name: Test
         id: test
         if: ${{ steps.update.outputs.updated == 'true' }}
-        run: dotnet test -c Release -v minimal
+        run: dotnet test ./src/ --nologo -c Release -v minimal
 
       - name: Push
         id: push
