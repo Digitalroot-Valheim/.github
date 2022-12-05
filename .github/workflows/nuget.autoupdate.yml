@@ -135,4 +135,5 @@ jobs:
           commit_user_name: github-actions[bot]
           commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
           commit_message: Automated NuGet Dependency Updates
+          disable_globbing: true
           file_pattern: 'packages.lock.json *.csproj'
