@@ -110,12 +110,14 @@ jobs:
       - name: Update
         id: update
         run: |
-          OUTPUT=$(dotnet outdated -vl Major --include Digitalroot --include digitalroot)
+          OUTPUT=$(dotnet outdated -r -vl Major --include Digitalroot)
           if [[ $OUTPUT =~ "No outdated dependencies were detected" ]]; then
-            echo "::set-output name=updated::false"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            echo "::notice title=updated::false"
           else
-            dotnet outdated -u
-            echo "::set-output name=updated::true"
+            dotnet outdated -u -r -vl Major --include Digitalroot
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "::notice title=updated::true"
           fi
         shell: bash
 
