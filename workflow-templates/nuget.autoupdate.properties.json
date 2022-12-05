@@ -1,0 +1,8 @@
+{
+    "name": "Automated NuGet Dependency Updates",
+    "description": "Automates NuGet dependency package update.",
+    "iconName": "dotnet",
+    "categories": [
+        "C#"
+    ]
+}
