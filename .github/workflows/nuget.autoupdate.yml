@@ -5,12 +5,12 @@ on:
     inputs:
       sln-file-name:
         description: 'Name of SLN file w/o .sln, assumes sln file is in the src-path dir. e.g. ./src-path/sln-file-name.sln'
-        required: true
+        required: false
         type: string
 
       proj-file-name:
         description: 'Name of proj file w/o .csproj, assumes proj dir is named the same as the proj-file-name. e.g. ./src-path/proj-file-name/proj-file-name.csproj'
-        required: true
+        required: false
         type: string
 
       src-path:
