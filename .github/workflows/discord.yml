@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run Discord Webhook
-      uses: johnnyhuy/actions-discord-git-webhook@v1.0.1
+      uses: johnnyhuy/actions-discord-git-webhook@main
       with:
         webhook_url: ${{ secrets.webhook_url }}
         hide_links: false
