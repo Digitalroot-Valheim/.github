@@ -11,7 +11,7 @@ on:
     secrets:
       webhook_url:
         description: 'Discord Webhook URL.'
-        required: false
+        required: true
 
 env:
   TIMEOUT: 5
@@ -29,7 +29,7 @@ jobs:
         hide_links: false
         censor_username: false
         repo_name: ${{ inputs.repo_name }}
-       
+
     # Disable URL links to the repository
     # 
     # - name: Run Discord Webhook
