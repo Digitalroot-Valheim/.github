@@ -101,7 +101,7 @@ jobs:
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
-        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
+        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }} --nologo -v d
 
       - name: Tools
         id: tools
