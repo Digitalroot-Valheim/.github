@@ -483,7 +483,7 @@ jobs:
     name: Upload to Nexus
     needs: [prebuild, build]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
 
     steps:
