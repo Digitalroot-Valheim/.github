@@ -484,7 +484,7 @@ jobs:
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package}}
+    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package && false }}
 
     steps:
       - name: Download artifact
