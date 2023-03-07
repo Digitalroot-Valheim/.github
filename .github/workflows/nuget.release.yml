@@ -239,13 +239,18 @@ jobs:
         id: workflow-testing
         run: |
           OUTPUT=$(git describe --tags --abbrev=0)
-          echo "::set-output name=updated::true"
+          echo "{updated}={true}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Dump steps context
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
         run: echo "$STEPS_CONTEXT"
+        
+      - name: Dump github context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"        
 
   #[BUILD]
   build:
