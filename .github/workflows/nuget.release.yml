@@ -213,7 +213,7 @@ jobs:
           proj-path: ${{ github.workspace }}/${{ inputs.src-path }}/${{ inputs.proj-file-name }}/${{ inputs.proj-file-name }}.csproj
 
       - name: Get Previous tag
-        uses: actions-ecosystem/action-get-latest-tag@v1.6.0
+        uses: KrogerWalt/action-get-latest-tag@v4
         id: previoustag
         with:
           semver_only: true
