@@ -216,7 +216,6 @@ jobs:
         uses: KrogerWalt/action-get-latest-tag@v4
         id: previoustag
         with:
-          semver_only: true
           initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Get next minor version
