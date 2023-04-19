@@ -220,7 +220,7 @@ jobs:
           initial_version: ${{steps.get-version.outputs.assembly-version}}
 
       - name: Get next minor version
-        uses: WyriHaximus/github-action-next-semvers@v1.1.0
+        uses: WyriHaximus/github-action-next-semvers@v1.2.1
         id: semvers
         with:
           version: ${{ steps.previoustag.outputs.tag }}
