@@ -194,6 +194,13 @@ jobs:
       previous-tag: ${{ steps.vars.outputs.previous-tag }}
       next-tag: ${{ steps.vars.outputs.next-tag }}
       is-nuget-package: ${{ steps.vars.outputs.is-nuget-package }}
+      ts-enable-upload: ${{ steps.vars.outputs.ts-enable-upload }}
+      ts-namespace: ${{ steps.vars.outputs.ts-namespace }}
+      ts-name: ${{ steps.vars.outputs.ts-name }}
+      ts-description: ${{ steps.vars.outputs.ts-description }}
+      ts-categories: ${{ steps.vars.outputs.ts-categories }}
+      ts-community: ${{ steps.vars.outputs.ts-community }}
+      ts-dependencies: ${{ steps.vars.outputs.ts-dependencies }}
 
     steps:
       - name: Checkout
@@ -247,6 +254,14 @@ jobs:
           echo "informational-version=${{ steps.get-version.outputs.informational-version }}" >> $GITHUB_OUTPUT
           echo "previous-tag=${{ steps.previoustag.outputs.tag }}" >> $GITHUB_OUTPUT
           echo "next-tag=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
+          echo "ts-enable-upload=${{ inputs.ts-enable-upload }}" >> $GITHUB_OUTPUT
+          echo "ts-namespace=${{ inputs.ts-namespace }}" >> $GITHUB_OUTPUT
+          echo "ts-name=${{ inputs.ts-name }}" >> $GITHUB_OUTPUT
+          echo "ts-description=${{ inputs.ts-description }}" >> $GITHUB_OUTPUT
+          echo "ts-categories=${{ inputs.ts-categories }}" >> $GITHUB_OUTPUT
+          echo "ts-community=${{ inputs.ts-community }}" >> $GITHUB_OUTPUT
+          echo "ts-dependencies=${{ inputs.ts-dependencies }}" >> $GITHUB_OUTPUT 
+        shell: bash
 
       - name: Log Inputs
         run: |
@@ -258,6 +273,7 @@ jobs:
           echo "::notice title=force-assembly-version::${{ inputs.force-assembly-version }}"
           echo "::notice title=create-github-release::${{ inputs.create-github-release }}"
           echo "::notice title=aws-region::${{ inputs.aws-region }}"
+        shell: bash          
 
       - name: Log Inputs cont
         run: |
@@ -267,6 +283,14 @@ jobs:
           echo "::notice title=nuget-org-upload::${{ inputs.nuget-org-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::notice title=ts-enable-upload::${{ inputs.ts-enable-upload }}"
+          echo "::notice title=ts-namespace::${{ inputs.ts-namespace }}"
+          echo "::notice title=ts-name::${{ inputs.ts-name }}"
+          echo "::notice title=ts-description::${{ inputs.ts-description }}"
+          echo "::notice title=ts-categories::${{ inputs.ts-categories }}"
+          echo "::notice title=ts-community::${{ inputs.ts-community }}"
+          echo "::notice title=ts-dependencies::${{ inputs.ts-dependencies }}"
+        shell: bash
 
       - name: Log Variables
         run: |
@@ -280,6 +304,7 @@ jobs:
           #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
           echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
           echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
+        shell: bash
 
       - name: Workflow Testing
         id: workflow-testing
