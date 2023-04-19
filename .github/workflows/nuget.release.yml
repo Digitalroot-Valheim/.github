@@ -306,13 +306,6 @@ jobs:
           echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
         shell: bash
 
-      - name: Workflow Testing
-        id: workflow-testing
-        run: |
-          OUTPUT=$(git describe --tags --abbrev=0)
-          echo "{updated}={true}" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Dump steps context
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
