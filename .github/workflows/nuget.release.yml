@@ -626,7 +626,9 @@ jobs:
           ls -laR
         shell: bash
 
-      - uses: GreenTF/upload-thunderstore-package@v3.1
+      #- uses: GreenTF/upload-thunderstore-package@v3.1
+      - uses: Digitalroot/upload-thunderstore-package@ce630c2076e66228fc5b37745f548f51c6568cac
+      
         with:
           namespace: ${{ inputs.ts-namespace }} Digitalroot # the thunderstore 'team' to publish under
           description: ${{ inputs.ts-description }}
