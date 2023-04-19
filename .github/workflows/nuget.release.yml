@@ -603,16 +603,22 @@ jobs:
           
       - name: Log Variables
         run: |
-          echo "::notice title=download-path::${{ steps.download.outputs.download-path }}"
-          #echo "::notice title=proj-file-name::${{ steps.vars.outputs.version }}"
-          #echo "::notice title=version-prefix::${{ steps.vars.outputs.version-prefix }}"
-          #echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
-          #echo "::notice title=package-version::${{ steps.vars.outputs.package-version }}"
-          echo "::notice title=assembly-version::${{ steps.vars.outputs.assembly-version }}"
-          #echo "::notice title=file-version::${{ steps.vars.outputs.file-version }}"
-          #echo "::notice title=informational-version::${{ steps.vars.outputs.informational-version }}"
-          echo "::notice title=previous-tag::${{ steps.vars.outputs.previous-tag }}"
-          echo "::notice title=next-tag::${{ steps.vars.outputs.next-tag }}"
+          echo "::notice title=ts-download-path::${{ steps.download.outputs.download-path }}"
+          echo "::notice title=ts-proj-file-namen::${{ needs.prebuild.outputs.proj-file-namen }}"
+          echo "::notice title=ts-next-tag:${{ needs.prebuild.outputs.next-tag }}"
+          echo "::notice title=version-suffix::${{ steps.vars.outputs.version-suffix }}"
+          echo "::notice title=ts-file::${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip"
+        shell: bash
+
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+        
+      - name: List Files
+        run: |
+          pwd
+          ls -laR
         shell: bash
 
       - uses: GreenTF/upload-thunderstore-package@v3.1
@@ -626,17 +632,6 @@ jobs:
           categories: ${{ inputs.ts-categories }}
           deps: ${{ inputs.ts-dependencies }}
           file: ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
-
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-        
-      - name: List Files
-        run: |
-          pwd
-          ls -laR
-        shell: bash
 
   #[PUBLISH]
   publish:
