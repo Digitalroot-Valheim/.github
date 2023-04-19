@@ -636,7 +636,8 @@ jobs:
           community: ${{ inputs.ts-community }} 
           categories: ${{ inputs.ts-categories }}
           deps: ${{ inputs.ts-dependencies }}
-          file: ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
+          path: ${{ steps.download.outputs.download-path }}
+          file: ./${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
 
   #[PUBLISH]
   publish:
