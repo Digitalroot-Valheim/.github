@@ -84,6 +84,48 @@ on:
         required: false
         default: -1
         type: number
+        
+      ts-enable-upload:
+        description: 'Upload Mod to Thunderstore'
+        required: false
+        default: false
+        type: boolean
+
+      ts-categories:
+        description: 'A list, separated by spaces of categories to give to the mod when published.'
+        required: false
+        default: "Server-side Client-side"
+        type: string
+        
+      ts-dependencies:
+        description: 'A list, separated by spaces, of mods this mod depends on. Must be in namespace-modname@1.2.3 format.'
+        required: false
+        default: "denikson-BepInExPack_Valheim@5.4.2105"
+        type: string
+        
+      ts-name:
+        description: 'Name of the package.'
+        required: false
+        default: false
+        type: string
+        
+      ts-description:
+        description: 'Description of the package that will appear on Thunderstore.'
+        required: false
+        default: false
+        type: string      
+        
+      ts-community:
+        description: 'Thunderstore community to publish to.'
+        required: false
+        default: "valheim"
+        type: string
+        
+      ts-namespace:
+        description: 'Name of the team to publish under.'
+        required: false
+        default: "Digitalroot"
+        type: string           
 
     secrets:
       aws-access-key-id:
@@ -108,6 +150,10 @@ on:
 
       nuget-org-key:
         description: 'nuget.org Api key'
+        required: false
+
+      ts-api-key:
+        description: 'Thunderstore Api key'
         required: false
 
 env:
@@ -514,6 +560,33 @@ jobs:
         run: |
           opmu nx check
           opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
+
+  # Thunderstore Upload
+  tsupload:
+    name: Upload to Thunderstore
+    needs: [prebuild, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: ${{ github.ref == 'refs/heads/main' && inputs.ts-enable-upload && !inputs.is-nuget-package }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: zip-package
+
+      - uses: GreenTF/upload-thunderstore-package@v3.1
+        with:
+          namespace: ${{ inputs.ts-namespace }} Digitalroot # the thunderstore 'team' to publish under
+          description: ${{ inputs.ts-description }}
+          token: ${{ secrets.ts-api-key }}
+          name: ${{ inputs.ts-name }} # the name of the package
+          version: ${{ needs.prebuild.outputs.next-tag }} # Use the tag as the package version
+          community: ${{ inputs.ts-community }} 
+          categories: ${{ inputs.ts-categories }}
+          deps: ${{ inputs.ts-dependencies }}
+          file: ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
 
   #[PUBLISH]
   publish:
