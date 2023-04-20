@@ -45,8 +45,8 @@ jobs:
       #ts-enable-upload: true
       #ts-namespace: Digitalroot
       #ts-name: ModName
-      #ts-description
+      #ts-description ""
       #ts-community: valheim
-      #ts-categories: Server-side Client-side Tweaks
+      #ts-categories: "server-side client-side tweaks" # https://thunderstore.io/api/experimental/community/valheim/category/
       #ts-dependencies: denikson-BepInExPack_Valheim@5.4.2105 ValheimModding-Jotunn@2.11.5
       
