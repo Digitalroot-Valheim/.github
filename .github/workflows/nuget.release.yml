@@ -622,7 +622,7 @@ jobs:
       - uses: Digitalroot/upload-thunderstore-package@main
       
         with:
-          namespace: ${{ inputs.ts-namespace }} Digitalroot # the thunderstore 'team' to publish under
+          namespace: ${{ inputs.ts-namespace }} # the thunderstore 'team' to publish under
           description: ${{ inputs.ts-description }}
           token: ${{ secrets.ts-api-key }}
           name: ${{ inputs.ts-name }} # the name of the package
