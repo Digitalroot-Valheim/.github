@@ -92,7 +92,7 @@ on:
         type: boolean
 
       ts-categories:
-        description: 'A list, separated by spaces of categories to give to the mod when published.'
+        description: 'A list, separated by spaces of categories to give to the mod when published. See https://thunderstore.io/api/experimental/community/valheim/category/'
         required: false
         default: "Server-side Client-side"
         type: string
