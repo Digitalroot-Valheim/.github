@@ -619,7 +619,7 @@ jobs:
         shell: bash
 
       #- uses: GreenTF/upload-thunderstore-package@v3.1
-      - uses: Digitalroot/upload-thunderstore-package@main
+      - uses: Digitalroot/upload-thunderstore-package@dr-main
       
         with:
           namespace: ${{ inputs.ts-namespace }} # the thunderstore 'team' to publish under
