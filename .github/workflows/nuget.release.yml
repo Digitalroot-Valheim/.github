@@ -567,7 +567,7 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: Restore tools
-        run: dotnet tool install -g Digitalroot.OdinPlusModUploader
+        run: dotnet tool install -g Digitalroot.ModUploader
 
       - name: Upload
         env:
@@ -575,8 +575,8 @@ jobs:
           NEXUSMOD_COOKIE_NEXUSID: ${{ secrets.nexus-cookie-nxid-header }}
           NEXUSMOD_COOKIE_SID_DEVELOP: ${{ secrets.nexus-cookie-sid-header }}
         run: |
-          opmu nx check
-          opmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
+          drmu nx check
+          drmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "OdinPlusModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
 
   # Thunderstore Upload
   tsupload:
