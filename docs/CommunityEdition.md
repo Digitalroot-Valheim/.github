@@ -1,1 +1,18 @@
 The Community Edition is by the Valheim community and for the Valheim community.
+
+# Statement for Governing Community Standards in Developing Community Edition Versions of Valheim mods.
+
+We are committed to fostering an inclusive and collaborative environment within our community-driven projects. The development of Community Edition versions of Valheim mods is guided by a set of community standards that promote mutual respect, open collaboration, and the shared goal of creating valuable and accessible software for all. These standards serve as the foundation for interaction and development within our community, ensuring a positive and productive experience for all contributors and users.
+
+1. **Inclusivity and Diversity**: We welcome contributions from individuals of diverse backgrounds, experiences, and perspectives. Discrimination, harassment, toxic and exclusionary behavior are strictly prohibited. Our community embraces equality and values the richness that different viewpoints bring to our projects. 
+1. **Open Communication**: Clear and respectful communication is essential to our community. Contributors are encouraged to engage in constructive discussions, offer and receive feedback graciously, and maintain a professional tone in all interactions.
+1. **Collaboration and Cooperation**: Collaboration is at the heart of our community. Contributors are expected to work together, leveraging each other's strengths to create high-quality software. Conflicts should be resolved through open dialogue and compromise, with the ultimate goal of moving the project forward.
+1. **Licensing and Copyright**: Respect for intellectual property rights is paramount. All contributions must adhere to the project's chosen open-source licenses, and contributors should ensure that they have the right to submit code and content. Proper attribution and copyright notices must be maintained.
+1. **Quality and Innovation**: We strive for excellence in the software we develop. Contributions should be of high quality, well-documented, and aligned with the project's objectives. Innovation is encouraged, and novel ideas are welcomed as long as they align with the project's vision.
+1. **Transparency**: Openness and transparency are central to our community. Major decisions, project roadmaps, and development processes should be communicated openly to foster trust and enable broader participation.
+1. **Respect for Community Guidelines**: Contributors are expected to follow community guidelines, coding standards, and best practices established by the project. This ensures consistency and facilitates ease of collaboration.
+1. **Ethical Considerations**: We are committed to ethical software development. Contributions that have the potential to harm individuals, communities, or the environment will not be accepted. Software should promote well-being and adhere to ethical principles.
+1. **Maintenance and Support**: The responsibility of maintaining and supporting Community Edition versions is a shared endeavor. Contributors are encouraged to provide assistance, answer queries, and engage in ongoing support discussions.
+1. **Continuous Improvement**: Our community standards are not static; they evolve with the community's needs. Regular review and refinement of these standards help us adapt to changing circumstances and ensure a vibrant, respectful, and productive community.
+
+By adhering to these community standards, we create a welcoming and collaborative space where contributors can thrive, innovation can flourish, and our shared software can make a positive impact on the world. Together, we build not just software, but a supportive community that embodies our values and drives our mission forward.
