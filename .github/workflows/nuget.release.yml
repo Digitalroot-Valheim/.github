@@ -631,7 +631,7 @@ jobs:
           name: ${{ inputs.ts-name }} # the name of the package
           version: ${{ needs.prebuild.outputs.next-tag }} # Use the tag as the package version
           community: ${{ inputs.ts-community }} 
-          categories: ${{ inputs.ts-categories }}
+          categories: ${{ inputs.ts-categories }} hildirs-request-update
           deps: ${{ inputs.ts-dependencies }}
           path: ${{ steps.download.outputs.download-path }}
           file: ./${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
