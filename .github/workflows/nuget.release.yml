@@ -696,8 +696,8 @@ jobs:
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         uses: ncipollo/release-action@v1.11.2
         with:
-          tag: v${{ needs.build.outputs.assembly-version }}
-          name: Release ${{ needs.build.outputs.assembly-version }}
+          tag: v${{ needs.prebuild.outputs.version }}
+          name: Release ${{ needs.prebuild.outputs.version }}
           body: ${{ steps.tag_version.outputs.changelog }}
           allowUpdates: false
           token: ${{ secrets.GITHUB_TOKEN }}
