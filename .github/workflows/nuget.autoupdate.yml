@@ -48,9 +48,9 @@ jobs:
           LC_ALL: en_US.utf8
         run: |
           echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
-          echo "date-short=${{ date +'%Y-%m-%d' }}" >> $GITHUB_OUTPUT
-          echo "date-year=${{ date +'%Y' }}" >> $GITHUB_OUTPUT
-          echo "date-month=${{ date +'%m' }}" >> $GITHUB_OUTPUT
+          echo "date-short=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "date-year=$(date +'%Y')" >> $GITHUB_OUTPUT
+          echo "date-month=$(date +'%m')" >> $GITHUB_OUTPUT
           echo "date-day=${{ date +'%d' }}" >> $GITHUB_OUTPUT          
           echo "sln-file-name=${{ inputs.sln-file-name }}" >> $GITHUB_OUTPUT
           echo "proj-file-name=${{ inputs.proj-file-name }}" >> $GITHUB_OUTPUT
