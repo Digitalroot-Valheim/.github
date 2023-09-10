@@ -51,7 +51,7 @@ jobs:
           echo "date-short=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
           echo "date-year=$(date +'%Y')" >> $GITHUB_OUTPUT
           echo "date-month=$(date +'%m')" >> $GITHUB_OUTPUT
-          echo "date-day=${{ date +'%d' }}" >> $GITHUB_OUTPUT          
+          echo "date-day=$(date +'%d'}}" >> $GITHUB_OUTPUT          
           echo "sln-file-name=${{ inputs.sln-file-name }}" >> $GITHUB_OUTPUT
           echo "proj-file-name=${{ inputs.proj-file-name }}" >> $GITHUB_OUTPUT
           echo "src-path=${{ inputs.src-path }}" >> $GITHUB_OUTPUT
@@ -99,9 +99,9 @@ jobs:
         id: cache
         with:
           path: ${{ github.workspace }}/.nuget/packages
-          key: ${{ runner.os }}-${{ steps.vars.outputs.date-year }}-${{ steps.date.outputs.date-month }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ runner.os }}-${{ steps.vars.outputs.date-year }}-${{ steps.vars.outputs.date-month }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ steps.vars.outputs.date-year }}-${{ steps.date.outputs.date-month }}-nuget-
+            ${{ runner.os }}-${{ steps.vars.outputs.date-year }}-${{ steps.vars.outputs.date-month }}-nuget-
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
