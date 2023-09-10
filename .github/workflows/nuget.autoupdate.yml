@@ -65,6 +65,10 @@ jobs:
       - name: Log Variables
         run: |
           echo "::notice title=date::${{ steps.vars.outputs.date }}"
+          echo "::notice title=date-short::${{ steps.vars.outputs.date-short }}"
+          echo "::notice title=date-year::${{ steps.vars.outputs.date-year }}"
+          echo "::notice title=date-month::${{ steps.vars.outputs.date-month }}"
+          echo "::notice title=date-day::${{ steps.vars.outputs.date-day }}"
 
       - name: Dump steps context
         env:
