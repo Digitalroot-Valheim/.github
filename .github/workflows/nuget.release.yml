@@ -55,6 +55,12 @@ on:
         default: true
         type: boolean
 
+      skip-build:
+        description: 'Should building be skipped?'
+        required: false
+        default: false
+        type: boolean
+
       nuget-gh-upload:
         description: 'Upload the nuget package to gh nuget repo.'
         required: false
@@ -194,6 +200,7 @@ jobs:
       previous-tag: ${{ steps.vars.outputs.previous-tag }}
       next-tag: ${{ steps.vars.outputs.next-tag }}
       is-nuget-package: ${{ steps.vars.outputs.is-nuget-package }}
+      skip-build : ${{ steps.vars.outputs.skip-build }}
       ts-enable-upload: ${{ steps.vars.outputs.ts-enable-upload }}
       ts-namespace: ${{ steps.vars.outputs.ts-namespace }}
       ts-name: ${{ steps.vars.outputs.ts-name }}
@@ -246,6 +253,7 @@ jobs:
           echo "nuget-s3-upload=${{ inputs.nuget-s3-upload }}" >> $GITHUB_OUTPUT
           echo "nuget-org-upload=${{ inputs.nuget-org-upload }}" >> $GITHUB_OUTPUT
           echo "is-nuget-package=${{ inputs.is-nuget-package }}" >> $GITHUB_OUTPUT
+          echo "skip-build=${{ inputs.skip-build }}" >> $GITHUB_OUTPUT
           echo "nexus-enable-upload=${{ inputs.nexus-enable-upload }}" >> $GITHUB_OUTPUT
           echo "nexus-mod-id=${{ inputs.nexus-mod-id }}" >> $GITHUB_OUTPUT
           echo "version=${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
@@ -281,6 +289,7 @@ jobs:
       - name: Log Inputs cont
         run: |
           echo "::notice title=is-nuget-package::${{ inputs.is-nuget-package }}"
+          echo "::notice title=skip-build::${{ inputs.skip-build }}"
           echo "::notice title=nuget-gh-upload::${{ inputs.nuget-gh-upload }}"
           echo "::notice title=nuget-s3-upload::${{ inputs.nuget-s3-upload }}"
           echo "::notice title=nuget-org-upload::${{ inputs.nuget-org-upload }}"
@@ -362,7 +371,7 @@ jobs:
         run: dotnet tool install -g replace-in-file
 
       - name: Build (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
+        if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package && !inputs.skip-build }}
         run: |
           replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/MetaData.cs" -set "0.0.1" "${{ needs.prebuild.outputs.next-tag }}"
           replace-in-file "$GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.proj-file-name }}/${{ needs.prebuild.outputs.proj-file-name }}.csproj" -set "0.0.1" "${{ needs.prebuild.outputs.next-tag }}"          
@@ -370,11 +379,11 @@ jobs:
         shell: bash
 
       - name: Build nuget (w/ Version Bump)
-        if: ${{ !inputs.force-assembly-version && inputs.is-nuget-package }}
+        if: ${{ !inputs.force-assembly-version && inputs.is-nuget-package && !inputs.skip-build }}
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Build (w/o Version Bump)
-        if: ${{ inputs.force-assembly-version }}
+        if: ${{ inputs.force-assembly-version && !inputs.skip-build }}
         run: dotnet build $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln -c Release --nologo -v n
 
       - name: Test
