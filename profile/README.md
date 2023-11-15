@@ -8,3 +8,7 @@
 | Digitalroot.Valheim.Common.Log | [![NuGet Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Log/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Log/actions/workflows/nuget.release.yml) |
 | Digitalroot.Valheim.Common.Names | [![NuGet Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Names/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Names/actions/workflows/nuget.release.yml) |
 | Digitalroot.Valheim.Common.Utils | [![NuGet Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Utils/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Utils/actions/workflows/nuget.release.yml) | 
+
+| Mod Projects | Status |
+| ------------- | ------------- |
+| Digitalroot.Valheim.BetterClubs | [![Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.BetterClubs/actions/workflows/release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.BetterClubs/actions/workflows/release.yml) |
