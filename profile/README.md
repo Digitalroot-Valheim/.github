@@ -11,6 +11,7 @@
 
 | Tools | Status |
 | ------------- | ------------- |
+| [Digitalroot.CustomMonoBehaviours](https://github.com/Digitalroot-Valheim/Digitalroot.CustomMonoBehaviours) | [![Build](https://github.com/Digitalroot-Valheim/Digitalroot.CustomMonoBehaviours/actions/workflows/builder.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.CustomMonoBehaviours/actions/workflows/builder.yml) |
 | [Digitalroot.ModUploader](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader) | [![Release](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader/actions/workflows/release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader/actions/workflows/release.yml) |
 
 | Mod Projects | Status |
