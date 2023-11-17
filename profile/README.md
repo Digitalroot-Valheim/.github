@@ -9,6 +9,10 @@
 | [Digitalroot.Valheim.Common.Names](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Names) | [![NuGet Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Names/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Names/actions/workflows/nuget.release.yml) |
 | [Digitalroot.Valheim.Common.Utils](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Utils) | [![NuGet Release](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Utils/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.Valheim.Common.Utils/actions/workflows/nuget.release.yml) | 
 
+| Tools | Status |
+| ------------- | ------------- |
+| [Digitalroot.ModUploader](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader) | [![Release](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader/actions/workflows/release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Digitalroot.ModUploader/actions/workflows/release.yml) |
+
 | Mod Projects | Status |
 | ------------- | ------------- |
 | [AtosArrowsJVL](https://github.com/Digitalroot-Valheim/Atokal-AtosArrowsJVL) | [![Release](https://github.com/Digitalroot-Valheim/Atokal-AtosArrowsJVL/actions/workflows/nuget.release.yml/badge.svg)](https://github.com/Digitalroot-Valheim/Atokal-AtosArrowsJVL/actions/workflows/nuget.release.yml) |
