@@ -211,7 +211,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get Assembly Version
         uses: kzrnm/get-net-sdk-project-versions-action@v1.3.0
@@ -351,7 +351,7 @@ jobs:
             2.1.x
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Package Cache
         uses: actions/cache@v3
@@ -458,7 +458,7 @@ jobs:
     steps:
       - name: Checkout
         if: ${{ !inputs.skip-unit-tests }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download nuget package
         if: ${{ !inputs.skip-unit-tests }}
