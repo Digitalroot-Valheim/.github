@@ -862,7 +862,7 @@ jobs:
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
         with:
             severity: info
-            details: Release ${{ needs.prebuild.outputs.next-tag }}
+            details: Github Release ${{ needs.prebuild.outputs.next-tag }}
             webhookUrl: ${{ secrets.webhook_url }}
 
       - name: Print Release Info
@@ -888,7 +888,7 @@ jobs:
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
         with:
             severity: info
-            details: Release ${{ needs.prebuild.outputs.version }}
+            details: Github Release ${{ needs.prebuild.outputs.version }}
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
