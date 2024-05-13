@@ -642,8 +642,8 @@ jobs:
           ls -laR
         shell: bash
 
-      #- uses: GreenTF/upload-thunderstore-package@v3.1
-      - uses: Digitalroot/upload-thunderstore-package@dr-main
+      - uses: GreenTF/upload-thunderstore-package@v4.3
+      #- uses: Digitalroot/upload-thunderstore-package@dr-main
         with:
           namespace: ${{ inputs.ts-namespace }} # the thunderstore 'team' to publish under
           description: ${{ inputs.ts-description }}
@@ -651,10 +651,11 @@ jobs:
           name: ${{ inputs.ts-name }} # the name of the package
           version: ${{ needs.prebuild.outputs.next-tag }} # Use the tag as the package version
           community: ${{ inputs.ts-community }} 
-          categories: ${{ inputs.ts-categories }} hildirs-request-update
-          deps: ${{ inputs.ts-dependencies }}
+          categories: ${{ inputs.ts-categories }} ashlands-update
+          deps: ${{ inputs.ts-dependencies }} denikson-BepInExPack_Valheim-5.4.2202
           path: ${{ steps.download.outputs.download-path }}
           file: ./${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
+          #repo: valheim.thunderstore.io
 
   #[PUBLISH]
   publish:
