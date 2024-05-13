@@ -726,3 +726,27 @@ jobs:
           artifacts: "${{ github.workspace }}/*.nupkg,${{ github.workspace }}/*.zip"
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: success()
+        with:
+            severity: info
+            details: Release ${{ needs.prebuild.outputs.version }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Release Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Release Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }}          
