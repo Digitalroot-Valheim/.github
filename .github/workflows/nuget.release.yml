@@ -516,6 +516,38 @@ jobs:
       - name: Push to GH nuget repository
         run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to github Release ${{ needs.prebuild.outputs.version }}
+            webhookUrl: ${{ secrets.webhook_url }}
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to github Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Upload to github Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Upload to github Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }}          
+
   #[PUSH S3]
   push-s3-nuget:
     name: Push nuget package to S3 repo
@@ -545,7 +577,39 @@ jobs:
           dotnet tool install -g sleet
           sleet push $GITHUB_WORKSPACE/nuget-package --skip-existing --config $GITHUB_WORKSPACE/sleet-config/sleet.json
           sleet retention prune --config $GITHUB_WORKSPACE/sleet-config/sleet.json
-        shell: bash          
+        shell: bash
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to s3 Release ${{ needs.prebuild.outputs.version }}
+            webhookUrl: ${{ secrets.webhook_url }}
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to s3g Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Upload to s3 Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Upload to s3 Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }}          
 
   #[PUSH NUGET.ORG]
   push-nuget-org:
@@ -572,6 +636,38 @@ jobs:
 
       - name: Push to nuget.org repository
         run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg -s https://api.nuget.org/v3/index.json --skip-duplicate -k ${{ secrets.nuget-org-key }}
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to nuget.org Release ${{ needs.prebuild.outputs.version }}
+            webhookUrl: ${{ secrets.webhook_url }}
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
+        with:
+            severity: info
+            details: Upload to nuget.org Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Upload to nuget.org Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Upload to nuget.org Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }}         
 
   # Nexus Upload
   nexusupload:
@@ -605,6 +701,30 @@ jobs:
           drmu nx check
           drmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "DigitalrootModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
         shell: bash
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: success()
+        with:
+            severity: info
+            details: Upload to Nexus Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Upload to Nexus Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Upload to Nexus Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }} 
         
   # Thunderstore Upload
   tsupload:
@@ -659,7 +779,31 @@ jobs:
           deps: ${{ inputs.ts-dependencies }} denikson-BepInExPack_Valheim-5.4.2202
           path: ${{ steps.download.outputs.download-path }}
           file: ./${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
-          #repo: valheim.thunderstore.io
+          repo: valheim.thunderstore.io
+
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: success()
+        with:
+            severity: info
+            details: Upload to Thunderstore Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Failure
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+            severity: error
+            details: Upload to Thunderstore Failed!
+            webhookUrl: ${{ secrets.webhook_url }}
+            
+      - name: Cancelled
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: cancelled()
+        with:
+            severity: warn
+            details: Upload to Thunderstore Cancelled!
+            webhookUrl: ${{ secrets.webhook_url }}  
 
   #[PUBLISH]
   publish:
@@ -713,6 +857,14 @@ jobs:
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
 
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
+        with:
+            severity: info
+            details: Release ${{ needs.prebuild.outputs.next-tag }}
+            webhookUrl: ${{ secrets.webhook_url }}
+
       - name: Print Release Info
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release }}
         run: echo "::notice title=Release::${{ needs.build.outputs.tag-version }}"
@@ -733,7 +885,7 @@ jobs:
 
       - name: Success
         uses: rjstone/discord-webhook-notify@v1.0.4
-        if: success()
+        if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
         with:
             severity: info
             details: Release ${{ needs.prebuild.outputs.version }}
@@ -741,7 +893,7 @@ jobs:
             
       - name: Failure
         uses: rjstone/discord-webhook-notify@v1.0.4
-        if: failure()
+        if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release && failure() }}
         with:
             severity: error
             details: Release Failed!
@@ -749,7 +901,7 @@ jobs:
             
       - name: Cancelled
         uses: rjstone/discord-webhook-notify@v1.0.4
-        if: cancelled()
+        if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release && cancelled() }}
         with:
             severity: warn
             details: Release Cancelled!
