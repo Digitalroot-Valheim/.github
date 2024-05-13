@@ -161,6 +161,10 @@ on:
       ts-api-key:
         description: 'Thunderstore Api key'
         required: false
+        
+      webhook_url:
+        description: 'Discord Webhook URL.'
+        required: true
 
 env:
   NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
