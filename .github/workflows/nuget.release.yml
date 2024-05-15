@@ -607,7 +607,7 @@ jobs:
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
-            details: Upload to s3g Release ${{ needs.prebuild.outputs.next-tag }}
+            details: Upload to s3 Release ${{ needs.prebuild.outputs.next-tag }}
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
