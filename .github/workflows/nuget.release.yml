@@ -572,6 +572,11 @@ jobs:
           pattern: nuget-package-*
           merge-multiple: true
 
+      - name: Download sleet config
+        uses: actions/download-artifact@v4
+        with:
+          name: sleet-config
+
       - name: Push to S3 nuget repository
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
