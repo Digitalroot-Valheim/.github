@@ -517,7 +517,7 @@ jobs:
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
       - name: Push to GH nuget repository
-        run: dotnet nuget push $GITHUB_WORKSPACE/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet nuget push $GITHUB_WORKSPACE/nuget-package/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
 
       - name: Success
         uses: rjstone/discord-webhook-notify@v1.0.4
