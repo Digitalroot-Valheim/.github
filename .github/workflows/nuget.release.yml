@@ -870,7 +870,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.next-tag }}
-          name: Release ${{ needs.prebuild.outputs.next-tag }}
+          name: ${{ needs.prebuild.outputs.next-tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -896,7 +896,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ needs.prebuild.outputs.version }}
-          name: Release ${{ needs.prebuild.outputs.version }}
+          name: ${{ needs.prebuild.outputs.version }}
           body: ${{ steps.tag_version.outputs.changelog }}
           allowUpdates: false
           token: ${{ secrets.GITHUB_TOKEN }}
