@@ -520,7 +520,7 @@ jobs:
         run: dotnet nuget push $GITHUB_WORKSPACE/nuget-package/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -528,7 +528,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -536,7 +536,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: failure()
         with:
             severity: error
@@ -544,7 +544,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: cancelled()
         with:
             severity: warn
@@ -595,7 +595,7 @@ jobs:
         shell: bash
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -603,7 +603,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -611,7 +611,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: failure()
         with:
             severity: error
@@ -619,7 +619,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: cancelled()
         with:
             severity: warn
@@ -656,7 +656,7 @@ jobs:
         run: dotnet nuget push $GITHUB_WORKSPACE/nuget-package/*.nupkg -s https://api.nuget.org/v3/index.json --skip-duplicate -k ${{ secrets.nuget-org-key }}
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -664,7 +664,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && success() }}
         with:
             severity: info
@@ -672,7 +672,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: failure()
         with:
             severity: error
@@ -680,7 +680,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: cancelled()
         with:
             severity: warn
@@ -724,7 +724,7 @@ jobs:
         run: dotnet tool uninstall --global Digitalroot.ModUploader
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: success()
         with:
             severity: info
@@ -732,7 +732,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: failure()
         with:
             severity: error
@@ -740,7 +740,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: cancelled()
         with:
             severity: warn
@@ -803,7 +803,7 @@ jobs:
           repo: valheim.thunderstore.io
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: success()
         with:
             severity: info
@@ -811,7 +811,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: failure()
         with:
             severity: error
@@ -819,7 +819,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: cancelled()
         with:
             severity: warn
@@ -880,7 +880,7 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ !inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
         with:
             severity: info
@@ -906,7 +906,7 @@ jobs:
           omitNameDuringUpdate: true
 
       - name: Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ inputs.force-assembly-version && github.ref == 'refs/heads/main' && inputs.create-github-release && success() }}
         with:
             severity: info
@@ -914,7 +914,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release && failure() }}
         with:
             severity: error
@@ -922,7 +922,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Cancelled
-        uses: rjstone/discord-webhook-notify@v1.0.4
+        uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release && cancelled() }}
         with:
             severity: warn
