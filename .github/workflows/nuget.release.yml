@@ -171,6 +171,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: true
 
 jobs:
   #[PREBUILD]
