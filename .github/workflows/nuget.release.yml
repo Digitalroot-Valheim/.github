@@ -118,13 +118,11 @@ on:
       ts-name:
         description: 'Name of the package.'
         required: false
-        default: false
         type: string
         
       ts-description:
         description: 'Description of the package that will appear on Thunderstore.'
         required: false
-        default: false
         type: string      
         
       ts-community:
@@ -192,7 +190,7 @@ jobs:
       unit-test-path: ${{ steps.vars.outputs.unit-test-path }}
       skip-unit-tests: ${{ steps.vars.outputs.skip-unit-tests }}
       force-assembly-version: ${{ steps.vars.outputs.force-assembly-version }}
-      create-github-release: ${{ steps.vars.create-github-release }}
+      create-github-release: ${{ steps.vars.outputs.create-github-release }}
       aws-region: ${{ steps.vars.outputs.aws-region }}
       nuget-gh-upload: ${{ steps.vars.outputs.nuget-gh-upload }}
       nuget-s3-upload: ${{ steps.vars.outputs.nuget-s3-upload }}
@@ -357,11 +355,11 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
-            6.0.x
+            10.0.x
             2.1.x
 
       - name: Checkout
@@ -520,10 +518,10 @@ jobs:
           merge-multiple: true
       - run: ls -R nuget-package
 
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
       - name: Push to GH nuget repository
@@ -573,10 +571,10 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Download nuget package
         uses: actions/download-artifact@v8
@@ -656,10 +654,10 @@ jobs:
           merge-multiple: true
       - run: ls -R nuget-package
 
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
           source-url: https://api.nuget.org/v3/index.json
 
       - name: Push to nuget.org repository
@@ -712,10 +710,10 @@ jobs:
         with:
           name: zip-package
 
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Upload to NexusMods
         uses: Nexus-Mods/upload-action@v1.0.0-beta.9
