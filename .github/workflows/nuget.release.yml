@@ -353,6 +353,8 @@ jobs:
       contents: read
       packages: read
     timeout-minutes: 10
+    env:
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 0
 
     steps:
       - name: Setup .NET SDK
@@ -376,7 +378,7 @@ jobs:
 
       - name: Restore
         if: steps.cache.outputs.cache-hit != 'true'
-        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d
+        run: dotnet restore $GITHUB_WORKSPACE/${{ needs.prebuild.outputs.src-path }}/${{ needs.prebuild.outputs.sln-file-name }}.sln --nologo -v d /p:ReferenceAssembliesSubset=netfx48
 
       - name: Install replace-in-file tool
         if: ${{ !inputs.force-assembly-version && !inputs.is-nuget-package }}
