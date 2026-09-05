@@ -90,6 +90,12 @@ on:
         required: false
         default: -1
         type: number
+
+      nexus-mod-file-id:
+        description: 'Nexus File Id for the mod.'
+        required: false
+        default: -1
+        type: number
         
       ts-enable-upload:
         description: 'Upload Mod to Thunderstore'
@@ -193,6 +199,7 @@ jobs:
       nuget-org-upload: ${{ steps.vars.outputs.nuget-org-upload }}
       nexus-enable-upload: ${{ steps.vars.outputs.nexus-enable-upload }}
       nexus-mod-id: ${{ steps.vars.outputs.nexus-mod-id }}
+      nexus-mod-file-id: ${{ steps.vars.outputs.nexus-mod-file-id }}
       date: ${{ steps.vars.outputs.date }}
       version: ${{ steps.vars.outputs.version }}
       version-prefix: ${{ steps.vars.outputs.version-prefix }}
@@ -261,6 +268,7 @@ jobs:
           echo "skip-build=${{ inputs.skip-build }}" >> $GITHUB_OUTPUT
           echo "nexus-enable-upload=${{ inputs.nexus-enable-upload }}" >> $GITHUB_OUTPUT
           echo "nexus-mod-id=${{ inputs.nexus-mod-id }}" >> $GITHUB_OUTPUT
+          echo "nexus-mod-file-id=${{ inputs.nexus-mod-file-id }}" >> $GITHUB_OUTPUT
           echo "version=${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
           echo "version-prefix=${{ steps.get-version.outputs.version-prefix }}" >> $GITHUB_OUTPUT
           echo "version-suffix=${{ steps.get-version.outputs.version-suffix }}" >> $GITHUB_OUTPUT
@@ -300,6 +308,7 @@ jobs:
           echo "::notice title=nuget-org-upload::${{ inputs.nuget-org-upload }}"
           echo "::notice title=nexus-enable-upload::${{ inputs.nexus-enable-upload }}"
           echo "::notice title=nexus-mod-id::${{ inputs.nexus-mod-id }}"
+          echo "::notice title=nexus-mod-file-id::${{ inputs.nexus-mod-file-id }}"
           echo "::notice title=ts-enable-upload::${{ inputs.ts-enable-upload }}"
           echo "::notice title=ts-namespace::${{ inputs.ts-namespace }}"
           echo "::notice title=ts-name::${{ inputs.ts-name }}"
@@ -694,7 +703,7 @@ jobs:
     needs: [prebuild, build]
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package }}
+    if: ${{ github.ref == 'refs/heads/main' && inputs.nexus-enable-upload && !inputs.is-nuget-package && inputs.nexus-mod-file-id != -1 && inputs.nexus-mod-id != -1 }}
 
     steps:
       - name: Download artifact
@@ -708,22 +717,19 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: Restore tools
-        run: dotnet tool install --global Digitalroot.ModUploader --version 1.4.3
-
-      - name: Upload
-        env:
-          NEXUSMOD_API_KEY: ${{ secrets.nexus-api-key }}
-          NEXUSMOD_SESSION_COOKIE: ${{ secrets.nexus-cookie-sid-header }}
-        run: |
-          drmu nx check
-          drmu nx upload ${{ inputs.nexus-mod-id }} ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip -v ${{ needs.prebuild.outputs.next-tag }} -d "DigitalrootModUploader (CI/CD)" -f ${{ needs.prebuild.outputs.proj-file-name }} -dmv
-        shell: bash
-
-      - name: Remove tools
-        if: always()
-        run: dotnet tool uninstall --global Digitalroot.ModUploader
-
+      - name: Upload to NexusMods
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.9
+        with:
+          api_key: ${{ secrets.nexus-api-key }}
+          file_id: ${{ inputs.nexus-mod-file-id }}
+          filename: ${{ steps.download.outputs.download-path }}/${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.zip
+          version: ${{ needs.prebuild.outputs.next-tag }}
+          mod_id: ${{ inputs.nexus-mod-id }}
+          category: main # optional
+          changelog: "DigitalrootModUploader (CI/CD)"
+          archive_existing_version: true
+          update_mod_version: true
+      
       - name: Success
         uses: rjstone/discord-webhook-notify@e3fdffbe09fc784fef3788aecf3ca806719aa7e3
         if: success()
