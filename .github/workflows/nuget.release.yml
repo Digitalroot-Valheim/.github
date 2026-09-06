@@ -718,7 +718,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Upload to NexusMods
-        uses: Nexus-Mods/upload-action@v1.0.0-beta.9
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.10
         with:
           api_key: ${{ secrets.nexus-api-key }}
           file_id: ${{ inputs.nexus-mod-file-id }}
