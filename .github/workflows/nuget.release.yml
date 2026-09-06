@@ -726,7 +726,6 @@ jobs:
           version: ${{ needs.prebuild.outputs.next-tag }}
           mod_id: ${{ inputs.nexus-mod-id }}
           category: main # optional
-          changelog: "DigitalrootModUploader (CI/CD)"
           archive_existing_version: true
           update_mod_version: true
       
