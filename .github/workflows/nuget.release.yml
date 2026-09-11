@@ -621,7 +621,7 @@ jobs:
             webhookUrl: ${{ secrets.webhook_url }}
             
       - name: Failure
-        uses: rjstone/discord-webhook-notify@v2.3.03
+        uses: rjstone/discord-webhook-notify@v2.3.0
         if: failure()
         with:
             severity: error
