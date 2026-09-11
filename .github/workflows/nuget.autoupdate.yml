@@ -86,20 +86,21 @@ jobs:
 
     steps:
       - name: Setup .NET 6 SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
-            6.0.x
+            10.0.x
+            2.1.x
 
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.github-pat }}
           ref: ${{ github.head_ref }}
 
       - name: Setup Package Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         id: cache
         with:
           path: ${{ github.workspace }}/.nuget/packages
@@ -137,7 +138,7 @@ jobs:
       - name: Push
         id: push
         if: ${{ steps.update.outputs.updated == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v4.16.0
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           commit_user_name: github-actions[bot]
