@@ -866,7 +866,7 @@ jobs:
       - name: Build Release Notes
         if: ${{ github.ref == 'refs/heads/main' && inputs.create-github-release }}
         id: tag_version
-        uses: anothrNick/github-tag-action@1.75.0
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
