@@ -802,7 +802,7 @@ jobs:
           name: ${{ inputs.ts-name }} # the name of the package
           version: ${{ needs.prebuild.outputs.next-tag }} # Use the tag as the package version
           community: ${{ inputs.ts-community }} 
-          categories: ${{ inputs.ts-categories }} ashlands-update
+          categories: ${{ inputs.ts-categories }}
           deps: ${{ inputs.ts-dependencies }} denikson-BepInExPack_Valheim-5.4.2202
           path: ${{ steps.download.outputs.download-path }}
           file: ./${{ needs.prebuild.outputs.proj-file-name }}.v${{ needs.prebuild.outputs.next-tag }}.ts.zip
